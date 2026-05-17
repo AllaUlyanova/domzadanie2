@@ -1,0 +1,247 @@
+// PostgreSQL + pgvector для RAG по учебникам
+// Включите расширение: CREATE EXTENSION IF NOT EXISTS vector;
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  PARENT
+  ADMIN
+}
+
+enum SubjectSlug {
+  MATH
+  RUSSIAN
+  WORLD
+  READING
+  ENGLISH
+}
+
+enum AnswerType {
+  TEXT
+  CHOICE
+  PHOTO
+  DRAWING
+  MATH_EXPRESSION
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  CHECKED
+  RETRY
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String?
+  role          UserRole  @default(PARENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  parentProfile ParentProfile?
+  studentProfile StudentProfile?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ParentProfile {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children  StudentProfile[]
+}
+
+model StudentProfile {
+  id              String   @id @default(cuid())
+  userId          String?  @unique
+  parentId        String?
+  displayName     String
+  grade           Int      @default(3)
+  city            String   @default("Москва")
+  schoolYear      String   @default("2025/2026")
+  avatarEmoji     String   @default("🦊")
+  totalXp         Int      @default(0)
+  streakDays      Int      @default(0)
+  lastActiveDate  DateTime?
+  createdAt       DateTime @default(now())
+  user            User?    @relation(fields: [userId], references: [id])
+  parent          ParentProfile? @relation(fields: [parentId], references: [id])
+  attempts        HomeworkAttempt[]
+  achievements    StudentAchievement[]
+  weakTopics      WeakTopic[]
+}
+
+model Subject {
+  id          String       @id @default(cuid())
+  slug        SubjectSlug  @unique
+  name        String
+  icon        String
+  color       String
+  sortOrder   Int          @default(0)
+  textbooks   Textbook[]
+}
+
+model Textbook {
+  id          String   @id @default(cuid())
+  subjectId   String
+  title       String
+  publisher   String?
+  umk         String?
+  grade       Int      @default(3)
+  year        Int      @default(2026)
+  pdfUrl      String?
+  pdfPath     String?
+  ocrStatus   String   @default("pending") // pending | processing | ready | error
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  lessons     Lesson[]
+  chunks      TextbookChunk[]
+  createdAt   DateTime @default(now())
+}
+
+/// Фрагмент учебника для RAG (pgvector)
+model TextbookChunk {
+  id          String   @id @default(cuid())
+  textbookId  String
+  lessonId    String?
+  pageFrom    Int?
+  pageTo      Int?
+  exerciseRef String?
+  content     String   @db.Text
+  /// JSON-массив embedding (pgvector: замените на vector(1536) в production)
+  embeddingJson Json?
+  metadata    Json?
+  textbook    Textbook @relation(fields: [textbookId], references: [id], onDelete: Cascade)
+  lesson      Lesson?  @relation(fields: [lessonId], references: [id])
+
+  @@index([textbookId])
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  textbookId  String
+  moduleNum   Int?
+  title       String
+  sortOrder   Int      @default(0)
+  textbook    Textbook @relation(fields: [textbookId], references: [id])
+  exercises   Exercise[]
+  chunks      TextbookChunk[]
+}
+
+model Exercise {
+  id            String     @id @default(cuid())
+  lessonId      String
+  number        String
+  page          Int?
+  prompt        String     @db.Text
+  answerType    AnswerType @default(TEXT)
+  choices       Json?
+  correctAnswer String?    @db.Text
+  difficulty    Int        @default(1)
+  lesson        Lesson     @relation(fields: [lessonId], references: [id])
+  attempts      HomeworkAttempt[]
+}
+
+model HomeworkAttempt {
+  id              String        @id @default(cuid())
+  studentId       String
+  exerciseId      String
+  status          AttemptStatus @default(IN_PROGRESS)
+  answerPayload   Json
+  isCorrect       Boolean?
+  score           Float?
+  aiFeedback      Json?
+  aiModel         String?
+  ragChunkIds     String[]
+  retryCount      Int           @default(0)
+  parentVisible   Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  student         StudentProfile @relation(fields: [studentId], references: [id])
+  exercise        Exercise      @relation(fields: [exerciseId], references: [id])
+  similarGenerated SimilarTask[] @relation("SourceAttempt")
+}
+
+model SimilarTask {
+  id              String   @id @default(cuid())
+  sourceAttemptId String
+  prompt          String   @db.Text
+  correctAnswer   String?  @db.Text
+  solved          Boolean  @default(false)
+  sourceAttempt   HomeworkAttempt @relation("SourceAttempt", fields: [sourceAttemptId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  title       String
+  description String
+  icon        String
+  xpReward    Int      @default(10)
+  students    StudentAchievement[]
+}
+
+model StudentAchievement {
+  id            String   @id @default(cuid())
+  studentId     String
+  achievementId String
+  earnedAt      DateTime @default(now())
+  student       StudentProfile @relation(fields: [studentId], references: [id])
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([studentId, achievementId])
+}
+
+model WeakTopic {
+  id          String   @id @default(cuid())
+  studentId   String
+  subjectSlug SubjectSlug
+  topic       String
+  errorCount  Int      @default(1)
+  lastSeenAt  DateTime @default(now())
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, subjectSlug, topic])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  meta      Json?
+  createdAt DateTime @default(now())
+}

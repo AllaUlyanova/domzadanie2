@@ -10,13 +10,27 @@
 - **Загрузка заданий** — JSON из ваших рабочих тетрадей (учебники PDF — в папке `content/textbooks/`).
 - **Дневник** — прогресс хранится в `localStorage` браузера.
 
-## Запуск
+## Запуск (простой сайт)
 
 ```powershell
 node .\scripts\dev.mjs
 ```
 
 Откройте адрес из консоли (обычно `http://localhost:5173`).
+
+## AI-платформа (Next.js 15)
+
+Полноценный MVP в папке **`platform/`** — PostgreSQL, OpenAI, RAG, кабинет родителя.
+
+```bash
+cd platform
+cp .env.example .env
+npm install
+npm run db:push && npm run db:seed
+npm run dev
+```
+
+См. [platform/README.md](platform/README.md) и [platform/docs/ARCHITECTURE.md](platform/docs/ARCHITECTURE.md).
 
 ## Загрузка своих заданий
 

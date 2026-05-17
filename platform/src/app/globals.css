@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Nunito", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-gradient-to-b from-amber-50 via-sky-50 to-violet-50 text-slate-800 antialiased;
+  font-family: var(--font-body);
+}
+
+html.dark body {
+  @apply from-slate-900 via-slate-900 to-indigo-950 text-slate-100;
+}
+
+@layer components {
+  .kid-card {
+    @apply rounded-kid-lg border-2 border-slate-800/10 bg-white/90 p-5 shadow-kid backdrop-blur dark:border-white/10 dark:bg-slate-800/90;
+  }
+  .kid-heading {
+    @apply font-display text-2xl font-extrabold tracking-tight md:text-3xl;
+    font-family: var(--font-display);
+  }
+}
