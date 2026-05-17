@@ -20,7 +20,9 @@ node .\scripts\dev.mjs
 
 ## Загрузка своих заданий
 
-См. `content/README.md` и пример `content/tasks/example-tasks.json`.
+См. `content/README.md`. Подключён **Spotlight 3** (английский): PDF в `content/textbooks/english/`, задания с проверкой в `content/tasks/english-spotlight-3.json`.
+
+Урок: **Сегодня** → **Английский язык** → ответ в поле под заданием → **Проверить** → блок **Результат** внизу.
 
 ## Структура проекта
 

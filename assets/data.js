@@ -52,8 +52,9 @@ export const SUBJECTS = [
     icon: "🇬🇧",
     accent: "#9b7bff",
     written: true,
-    textbookHint: "English 3 (учебник)",
-    workbookHint: "Activity Book / рабочая тетрадь",
+    textbookHint: "Spotlight 3 — «Английский в фокусе» (учебник)",
+    workbookHint: "Рабочая тетрадь Spotlight 3",
+    umk: "Spotlight 3",
   },
   {
     id: "art",

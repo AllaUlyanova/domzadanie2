@@ -32,6 +32,39 @@ const KEYS = {
   theme: "school3_theme",
 };
 
+const BUNDLED_TASK_URLS = ["./content/tasks/english-spotlight-3.json"];
+let bundledTasks = [];
+let serverCatalog = null;
+
+async function loadBundledTasksFromServer() {
+  bundledTasks = [];
+  for (const url of BUNDLED_TASK_URLS) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (Array.isArray(data.tasks)) bundledTasks.push(...data.tasks);
+    } catch {
+      /* сервер не запущен */
+    }
+  }
+}
+
+async function loadServerCatalog() {
+  try {
+    const res = await fetch("./content/catalog.json");
+    if (res.ok) serverCatalog = await res.json();
+  } catch {
+    /* offline */
+  }
+}
+
+function getCatalogBooks() {
+  const local = loadJSON(KEYS.catalog, { books: [] });
+  if (serverCatalog?.books?.length) return serverCatalog.books;
+  return local.books || [];
+}
+
 // ---------- Theme ----------
 const themeBtn = $("#themeBtn");
 function applyTheme(next) {
@@ -73,9 +106,16 @@ function saveJSON(key, value) {
 function getAllTasks() {
   const custom = loadJSON(KEYS.tasks, { tasks: [] });
   const uploaded = Array.isArray(custom.tasks) ? custom.tasks : [];
-  const ids = new Set(uploaded.map((t) => t.id));
-  const demo = DEMO_TASKS.filter((t) => !ids.has(t.id));
-  return [...uploaded, ...demo];
+  const uploadedIds = new Set(uploaded.map((t) => t.id));
+  const bundled = bundledTasks.filter((t) => !uploadedIds.has(t.id));
+  const allIds = new Set([...uploaded, ...bundled].map((t) => t.id));
+  const hasEnglishBundled = bundled.some((t) => t.subjectId === "english");
+  const demo = DEMO_TASKS.filter((t) => {
+    if (allIds.has(t.id)) return false;
+    if (hasEnglishBundled && t.subjectId === "english") return false;
+    return true;
+  });
+  return [...uploaded, ...bundled, ...demo];
 }
 
 function todayKey(d = new Date()) {
@@ -119,8 +159,32 @@ function persistDay(dateKey) {
 function tasksForSubject(subjectId, dateKey = todayKey()) {
   const all = getAllTasks();
   const dated = all.filter((t) => t.subjectId === subjectId && t.date === dateKey);
-  if (dated.length) return dated;
-  return all.filter((t) => t.subjectId === subjectId && !t.date);
+  const list = dated.length
+    ? dated
+    : all.filter((t) => t.subjectId === subjectId && !t.date);
+  return list.sort((a, b) => {
+    const ua = a.unit ?? 999;
+    const ub = b.unit ?? 999;
+    if (ua !== ub) return ua - ub;
+    return (Number(a.page) || 0) - (Number(b.page) || 0);
+  });
+}
+
+function homeworkStats(subject, tasks) {
+  const sub = getSubjectState(subject.id);
+  let correct = 0;
+  let wrong = 0;
+  let pending = 0;
+  tasks.forEach((t) => {
+    const st = sub.tasks[t.id];
+    if (!st?.checkedAt) {
+      pending += 1;
+      return;
+    }
+    if (st.correct) correct += 1;
+    else wrong += 1;
+  });
+  return { correct, wrong, pending, total: tasks.length };
 }
 
 function subjectStatus(subject, dateKey = todayKey()) {
@@ -344,6 +408,120 @@ function syncLessonSteps(subject, tasks) {
 // ---------- Lesson ----------
 let activeSubjectId = null;
 
+function renderLessonMaterials(subjectId) {
+  const box = $("#lessonMaterials");
+  if (!box) return;
+  const books = getCatalogBooks().filter((b) => b.subjectId === subjectId);
+  if (!books.length) {
+    box.classList.add("is-hidden");
+    box.innerHTML = "";
+    return;
+  }
+  box.classList.remove("is-hidden");
+  const subject = getSubject(subjectId);
+  box.innerHTML = `
+    <h3 class="lesson-materials__title">📚 Материалы${subject?.umk ? ` · ${escapeHtml(subject.umk)}` : ""}</h3>
+    <p class="muted lesson-materials__lead">Откройте PDF, найдите страницу из задания, затем введите ответ ниже.</p>
+    <ul class="lesson-materials__list">
+      ${books
+        .map(
+          (b) => `
+        <li>
+          <a class="lesson-materials__link" href="./${escapeHtml(b.file || "")}" target="_blank" rel="noopener">
+            ${escapeHtml(b.title || "PDF")}
+          </a>
+          <span class="muted lesson-materials__type">${escapeHtml(b.type || "")}</span>
+        </li>`,
+        )
+        .join("")}
+    </ul>
+  `;
+}
+
+function renderHomeworkResult(subject, tasks) {
+  const box = $("#homeworkResult");
+  if (!box) return;
+  if (!tasks.length) {
+    box.classList.add("is-hidden");
+    box.innerHTML = "";
+    return;
+  }
+  const { correct, wrong, pending, total } = homeworkStats(subject, tasks);
+  const checked = correct + wrong;
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+  const allDone = pending === 0;
+  const allCorrect = allDone && correct === total;
+
+  let verdict = "Проверьте задания по одному или нажмите «Проверить всё».";
+  let verdictClass = "";
+  if (allCorrect) {
+    verdict = "Отлично! Все ответы верны. Можно переписывать в тетрадь.";
+    verdictClass = "msg--ok";
+  } else if (allDone && wrong > 0) {
+    verdict = "Есть ошибки — исправьте и нажмите «Проверить» ещё раз.";
+    verdictClass = "msg--err";
+  } else if (checked > 0) {
+    verdict = `Проверено ${checked} из ${total}. Продолжайте!`;
+    verdictClass = "";
+  }
+
+  box.classList.remove("is-hidden");
+  box.innerHTML = `
+    <div class="homework-result__inner card">
+      <div class="homework-result__head">
+        <strong>Результат домашней работы</strong>
+        <span class="badge">${correct} / ${total} верно</span>
+      </div>
+      <div class="progress homework-result__bar" aria-hidden="true">
+        <div class="progress__bar" style="width: ${pct}%"></div>
+      </div>
+      <ul class="homework-result__stats muted">
+        <li>✓ Верно: <strong>${correct}</strong></li>
+        <li>✗ Ошибок: <strong>${wrong}</strong></li>
+        <li>○ Не проверено: <strong>${pending}</strong></li>
+      </ul>
+      <p class="msg ${verdictClass} homework-result__verdict">${escapeHtml(verdict)}</p>
+      <button type="button" class="btn btn--primary" id="checkAllHomeworkBtn">Проверить всё</button>
+    </div>
+  `;
+
+}
+
+function checkAllHomework(subject, tasks) {
+  const list = $("#taskList");
+  if (!list) return;
+  let any = false;
+  tasks.forEach((task) => {
+    const card = list.querySelector(`[data-task-id="${task.id}"]`);
+    if (!card) return;
+    const input = card.querySelector("[data-task-input]");
+    const value = input?.value ?? "";
+    if (!String(value).trim()) return;
+    any = true;
+    const result = checkAnswer(task, value);
+    const subj = getSubjectState(subject.id);
+    subj.tasks[task.id] = { last: value, correct: result.ok, checkedAt: Date.now() };
+    const feedback = card.querySelector("[data-feedback]");
+    if (result.ok) {
+      feedback.innerHTML = '<div class="msg msg--ok">Верно!</div>';
+      flashTaskCorrect(card);
+    } else {
+      feedback.innerHTML = '<div class="msg msg--err">Неверно. Попробуйте ещё.</div>';
+      flashTaskWrong(card, input);
+    }
+  });
+  if (!any) {
+    toast("Сначала введите ответы в поля");
+    return;
+  }
+  persistDay(todayKey());
+  updateNotebookButton(subject, tasks);
+  syncLessonSteps(subject, tasks);
+  updateDashboard();
+  renderHomeworkResult(subject, tasks);
+  toast("Проверка завершена");
+}
+
 function openLesson(subjectId) {
   const subject = getSubject(subjectId);
   if (!subject) return;
@@ -364,6 +542,7 @@ function openLesson(subjectId) {
 
   $("#lessonBookRef").textContent = `Учебник: ${ref?.textbook || subject.textbookHint}`;
 
+  renderLessonMaterials(subjectId);
   renderTasks(subject, tasks);
   updateNotebookButton(subject, tasks);
   syncLessonSteps(subject, tasks);
@@ -414,6 +593,8 @@ function renderTasks(subject, tasks) {
     empty.textContent = subject.written
       ? "Заданий пока нет. Родитель может загрузить файл с заданиями в разделе «Учебники»."
       : "Письменных заданий на сайте нет. Выполните задание учителя и нажмите «Отметить выполнение».";
+    $("#homeworkResult")?.classList.add("is-hidden");
+    $("#lessonMaterials")?.classList.add("is-hidden");
     return;
   }
   empty.classList.add("is-hidden");
@@ -437,6 +618,7 @@ function renderTasks(subject, tasks) {
         : `<input class="input task__input" data-task-input type="text" value="${escapeHtml(state.last || "")}" placeholder="Ваш ответ" />`;
 
     card.innerHTML = `
+      ${task.unitTitle ? `<p class="task__unit muted">${escapeHtml(task.unitTitle)}</p>` : ""}
       <div class="task__head">
         <span class="badge">Задание ${index + 1}</span>
         <span class="muted task__ref">${escapeHtml(String(task.workbook || ""))} · стр. ${escapeHtml(String(task.page ?? "—"))} · ${escapeHtml(task.exercise || "")}</span>
@@ -480,6 +662,7 @@ function renderTasks(subject, tasks) {
       updateNotebookButton(subject, tasks);
       syncLessonSteps(subject, tasks);
       updateDashboard();
+      renderHomeworkResult(subject, tasks);
     });
 
     card.querySelector("[data-hint]")?.addEventListener("click", () => {
@@ -488,6 +671,8 @@ function renderTasks(subject, tasks) {
 
     list.appendChild(card);
   });
+
+  renderHomeworkResult(subject, tasks);
 }
 
 function escapeHtml(s) {
@@ -497,6 +682,13 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
+
+$("#homeworkResult")?.addEventListener("click", (e) => {
+  if (e.target.id !== "checkAllHomeworkBtn" || !activeSubjectId) return;
+  const subject = getSubject(activeSubjectId);
+  if (!subject) return;
+  checkAllHomework(subject, tasksForSubject(activeSubjectId));
+});
 
 $("#backToTodayBtn")?.addEventListener("click", closeLesson);
 
@@ -565,11 +757,11 @@ function mergeTasks(payload) {
 function renderCatalog() {
   const list = $("#catalogList");
   if (!list) return;
-  const catalog = loadJSON(KEYS.catalog, { books: [] });
-  const custom = loadJSON(KEYS.tasks, { tasks: [] });
+  const books = getCatalogBooks();
   const count = getAllTasks().length;
+  const enCount = getAllTasks().filter((t) => t.subjectId === "english").length;
 
-  if (!catalog.books?.length && !custom.tasks?.length) {
+  if (!books.length && count <= DEMO_TASKS.length) {
     list.innerHTML = `<div class="muted">Демо‑задания активны (${DEMO_TASKS.length} шт.). Загрузите свой JSON.</div>`;
     return;
   }
@@ -577,15 +769,19 @@ function renderCatalog() {
   list.innerHTML = "";
   const summary = document.createElement("div");
   summary.className = "list__item";
-  summary.innerHTML = `<div class="list__title">Всего заданий в базе: ${count}</div>`;
+  summary.innerHTML = `<div class="list__title">Всего заданий в базе: ${count}</div>
+    <div class="list__meta">Английский (Spotlight 3): ${enCount} заданий с проверкой</div>`;
   list.appendChild(summary);
 
-  (catalog.books || []).forEach((b) => {
+  books.forEach((b) => {
+    const sub = getSubject(b.subjectId);
     const item = document.createElement("div");
-    item.className = "list__item";
+    item.className = "list__item list__item--book";
+    const href = b.file ? `./${b.file}` : "#";
     item.innerHTML = `
       <div class="list__title">${escapeHtml(b.title || "Без названия")}</div>
-      <div class="list__meta">${escapeHtml(b.subjectId || "")} · ${escapeHtml(b.type || "учебник")}</div>
+      <div class="list__meta">${escapeHtml(sub?.name || b.subjectId || "")} · ${escapeHtml(b.type || "учебник")}</div>
+      ${b.file ? `<a class="btn btn--ghost btn--sm list__open" href="${escapeHtml(href)}" target="_blank" rel="noopener">Открыть PDF</a>` : ""}
     `;
     list.appendChild(item);
   });
@@ -624,6 +820,21 @@ $("#loadSampleBtn")?.addEventListener("click", async () => {
     msg.innerHTML = `<div class="msg msg--ok">Пример загружен. В базе ${total} заданий.</div>`;
     renderCatalog();
     renderTodayGrid();
+  } catch (err) {
+    msg.innerHTML = `<div class="msg msg--err">${escapeHtml(err.message)}</div>`;
+  }
+});
+
+$("#loadSpotlightBtn")?.addEventListener("click", async () => {
+  const msg = $("#uploadMsg");
+  try {
+    await loadBundledTasksFromServer();
+    const total = getAllTasks().length;
+    msg.innerHTML = `<div class="msg msg--ok">Spotlight 3: ${bundledTasks.length} заданий. Всего в базе: ${total}.</div>`;
+    renderCatalog();
+    renderTodayGrid();
+    if (activeSubjectId === "english") openLesson("english");
+    toast("Задания Spotlight обновлены");
   } catch (err) {
     msg.innerHTML = `<div class="msg msg--err">${escapeHtml(err.message)}</div>`;
   }
@@ -709,10 +920,15 @@ function boot() {
   requestAnimationFrame(() => refreshScrollReveal());
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", boot);
-} else {
+async function initApp() {
+  await Promise.all([loadBundledTasksFromServer(), loadServerCatalog()]);
   boot();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
 }
 // Drag & drop on upload zone
 const uploadZone = $("#uploadZone");

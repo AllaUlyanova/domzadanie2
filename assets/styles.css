@@ -1528,6 +1528,105 @@ html.motion-ready .scroll-reveal.is-visible {
   display: none;
 }
 
+.lesson-guide {
+  margin-bottom: 14px;
+  padding: 16px 18px;
+  border-left: 5px solid var(--accent);
+}
+.lesson-guide__title {
+  margin: 0 0 8px;
+}
+.lesson-guide__steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.lesson-guide__steps li + li {
+  margin-top: 6px;
+}
+
+.lesson-materials {
+  margin-bottom: 14px;
+}
+.lesson-materials__title {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+.lesson-materials__lead {
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+.lesson-materials__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.lesson-materials__link {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.lesson-materials__type {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.homework-result {
+  margin-top: 18px;
+}
+.homework-result.is-hidden {
+  display: none;
+}
+.homework-result__inner {
+  padding: 18px;
+  border: 2px solid var(--line-strong);
+}
+.homework-result__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.homework-result__bar {
+  height: 10px;
+  margin-bottom: 14px;
+}
+.homework-result__stats {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  font-size: 14px;
+}
+.homework-result__verdict {
+  margin: 0 0 14px;
+}
+
+.task__unit {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.list__item--book {
+  display: grid;
+  gap: 6px;
+}
+.list__open {
+  justify-self: start;
+  margin-top: 4px;
+}
+
 .upload-zone {
   border-style: dashed !important;
   border-width: 3px !important;

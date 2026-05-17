@@ -191,10 +191,22 @@
             </aside>
 
             <div class="lesson-main">
+              <div class="lesson-guide card" id="lessonGuide">
+                <p class="lesson-guide__title"><strong>Как сделать домашку на сайте</strong></p>
+                <ol class="lesson-guide__steps muted">
+                  <li>Откройте учебник или рабочую тетрадь по ссылкам слева.</li>
+                  <li>Найдите задание по номеру страницы и упражнения.</li>
+                  <li><strong>Напишите ответ в поле под заданием</strong> и нажмите «Проверить».</li>
+                  <li>Внизу появится <strong>результат</strong> — сколько ответов верно.</li>
+                  <li>Перепишите верные ответы в школьную тетрадь.</li>
+                </ol>
+              </div>
+              <div id="lessonMaterials" class="lesson-materials card is-hidden" aria-label="Материалы урока"></div>
               <div id="lessonEmpty" class="card muted lesson-empty is-hidden">
                 Заданий пока нет. Родитель может загрузить файл с заданиями в разделе «Учебники».
               </div>
               <div id="taskList" class="task-list"></div>
+              <div id="homeworkResult" class="homework-result is-hidden" aria-live="polite"></div>
             </div>
           </div>
         </div>
@@ -261,8 +273,8 @@
             <span class="section__tag">Для родителей</span>
             <h2>Учебники и задания</h2>
             <p class="muted">
-              Сюда позже можно загрузить список заданий из рабочих тетрадей (файл JSON). PDF учебников храните в папке
-              <code>content/textbooks/</code> на компьютере — ссылки добавятся в каталог.
+              Учебники PDF лежат в <code>content/textbooks/</code>. Задания для проверки — в JSON (можно добавить свои).
+              Ученик отвечает в разделе <a href="#today">Сегодня</a> → предмет → поле под заданием → «Проверить».
             </p>
           </div>
 
@@ -273,12 +285,13 @@
               <input id="tasksFileInput" type="file" accept=".json,application/json" hidden />
               <button id="pickTasksBtn" class="btn btn--primary" type="button">Выбрать файл</button>
               <button id="loadSampleBtn" class="btn btn--ghost" type="button">Подгрузить пример с сервера</button>
+              <button id="loadSpotlightBtn" class="btn btn--ghost" type="button">Обновить задания Spotlight 3</button>
               <div id="uploadMsg" class="form__msg" role="status"></div>
             </div>
 
             <div class="card">
               <h3>Каталог учебников</h3>
-              <p class="muted">После загрузки здесь появятся названия книг по предметам.</p>
+              <p class="muted">Ссылки на PDF и список заданий по предметам. Сейчас подключён Spotlight 3 (английский).</p>
               <div id="catalogList" class="list muted">Пока пусто — используются демо‑задания.</div>
               <details class="schema-details">
                 <summary>Формат файла заданий</summary>

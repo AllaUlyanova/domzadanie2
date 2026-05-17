@@ -1,4 +1,36 @@
 {
-  "books": [],
-  "note": "Добавьте сюда учебники после загрузки PDF в content/textbooks/{subjectId}/"
+  "books": [
+    {
+      "id": "en-spotlight-textbook",
+      "subjectId": "english",
+      "title": "УМК «Английский в фокусе» 3 класс — Учебник",
+      "type": "учебник",
+      "umk": "Spotlight 3",
+      "file": "content/textbooks/english/uchebnik-spotlight-3.pdf"
+    },
+    {
+      "id": "en-spotlight-workbook",
+      "subjectId": "english",
+      "title": "УМК «Английский в фокусе» 3 класс — Рабочая тетрадь",
+      "type": "рабочая тетрадь",
+      "umk": "Spotlight 3",
+      "file": "content/textbooks/english/rabochaya-tetrad-spotlight-3.pdf"
+    },
+    {
+      "id": "en-spotlight-sbornik",
+      "subjectId": "english",
+      "title": "УМК «Английский в фокусе» 3 класс — Сборник упражнений",
+      "type": "сборник",
+      "umk": "Spotlight 3",
+      "file": "content/textbooks/english/sbornik-spotlight-3.pdf"
+    },
+    {
+      "id": "en-spotlight-flashcards",
+      "subjectId": "english",
+      "title": "УМК «Английский в фокусе» 3 класс — Flashcards",
+      "type": "flashcards",
+      "umk": "Spotlight 3",
+      "file": "content/textbooks/english/flashcards-spotlight-3.pdf"
+    }
+  ]
 }
