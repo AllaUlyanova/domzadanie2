@@ -414,6 +414,42 @@ function updateDashboard() {
   const statProgress = $("#statProgress");
   if (statProgress) statProgress.textContent = `${pct}%`;
 
+  const lpProgress = $("#lpStatProgress");
+  if (lpProgress) lpProgress.textContent = `${pct}%`;
+
+  const { day } = getDayState(dk);
+  let correctToday = 0;
+  SUBJECTS.forEach((s) => {
+    const sub = day.subjects[s.id];
+    if (!sub?.tasks) return;
+    Object.values(sub.tasks).forEach((t) => {
+      if (t.correct) correctToday += 1;
+    });
+  });
+  const lpCorrect = $("#lpStatCorrect");
+  if (lpCorrect) lpCorrect.textContent = String(correctToday);
+
+  const lpStreak = $("#lpStatStreak");
+  if (lpStreak) {
+    const all = loadProgress();
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 365; i++) {
+      const key = todayKey(d);
+      const dayRow = all[key];
+      const active =
+        dayRow &&
+        SUBJECTS.some((s) => {
+          const sub = dayRow.subjects?.[s.id];
+          return sub && Object.values(sub.tasks || {}).some((t) => t.correct);
+        });
+      if (!active) break;
+      streak += 1;
+      d.setDate(d.getDate() - 1);
+    }
+    lpStreak.textContent = String(streak);
+  }
+
   const planBadge = $("#planBadge");
   if (planBadge) planBadge.textContent = `${done} / ${total}`;
 

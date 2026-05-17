@@ -1,0 +1,415 @@
+/* Лендинг «Умный Дневник AI» — стили из макета */
+
+.lp-header {
+  width: 100%;
+  padding: 25px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+}
+
+.lp-logo {
+  font-size: 32px;
+  font-weight: 800;
+  color: #6c5ce7;
+}
+
+.lp-nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.lp-nav a {
+  font-weight: 700;
+  transition: 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.lp-nav a:hover {
+  color: #6c5ce7;
+}
+
+.lp-login-btn {
+  padding: 12px 24px;
+  border-radius: 16px;
+  background: #6c5ce7;
+  color: white;
+  font-weight: 700;
+  transition: 0.3s;
+  border: none;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+}
+
+.lp-login-btn:hover {
+  transform: scale(1.05);
+}
+
+@keyframes lp-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes lp-fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lp-pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(108, 92, 231, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(108, 92, 231, 0.4);
+  }
+}
+
+.lp-hero {
+  padding: 180px 60px 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
+  gap: 40px;
+  font-family: "Nunito", sans-serif;
+  background: #f3f7ff;
+}
+
+.lp-hero-left {
+  max-width: 600px;
+  animation: lp-fadeUp 1s ease;
+}
+
+.lp-hero-title {
+  font-size: clamp(42px, 6vw, 72px);
+  line-height: 1.1;
+  font-weight: 800;
+  margin-bottom: 25px;
+}
+
+.lp-gradient {
+  background: linear-gradient(90deg, #6c5ce7, #00cec9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lp-hero-text {
+  font-size: clamp(18px, 2.5vw, 24px);
+  color: #555;
+  margin-bottom: 35px;
+  line-height: 1.5;
+}
+
+.lp-hero-buttons {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.lp-primary-btn {
+  background: #6c5ce7;
+  color: white;
+  padding: 18px 34px;
+  border-radius: 22px;
+  font-size: 20px;
+  font-weight: 800;
+  transition: 0.3s;
+  animation: lp-pulseGlow 3s infinite;
+  border: none;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.lp-primary-btn:hover {
+  transform: translateY(-4px);
+}
+
+.lp-secondary-btn {
+  background: white;
+  padding: 18px 34px;
+  border-radius: 22px;
+  font-size: 20px;
+  font-weight: 800;
+  border: 2px solid #e0e0ff;
+  transition: 0.3s;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
+
+.lp-secondary-btn:hover {
+  background: #f5f5ff;
+}
+
+.lp-hero-right {
+  animation: lp-float 4s infinite ease-in-out;
+}
+
+.lp-mascot {
+  width: min(420px, 100%);
+  background: white;
+  border-radius: 40px;
+  padding: 30px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+}
+
+.lp-mascot img {
+  width: 100%;
+  border-radius: 20px;
+}
+
+.lp-section {
+  padding: 100px 60px;
+  font-family: "Nunito", sans-serif;
+  background: #f3f7ff;
+}
+
+.lp-section-title {
+  text-align: center;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.lp-section-subtitle {
+  text-align: center;
+  font-size: 22px;
+  color: #666;
+  margin-bottom: 60px;
+}
+
+.lp-subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.lp-subject-card {
+  background: white;
+  border-radius: 30px;
+  padding: 35px;
+  transition: 0.4s;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.lp-subject-card:hover {
+  transform: translateY(-10px);
+}
+
+.lp-subject-icon {
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+.lp-subject-title {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.lp-subject-text {
+  color: #666;
+  line-height: 1.5;
+}
+
+.lp-homework-box {
+  background: white;
+  border-radius: 40px;
+  padding: 50px;
+  max-width: 1000px;
+  margin: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+}
+
+.lp-form-group {
+  margin-bottom: 25px;
+}
+
+.lp-form-group label {
+  display: block;
+  font-weight: 800;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.lp-form-group input,
+.lp-form-group select,
+.lp-form-group textarea {
+  width: 100%;
+  padding: 18px;
+  border-radius: 18px;
+  border: 2px solid #e4e4ff;
+  font-size: 18px;
+  font-family: "Nunito", sans-serif;
+}
+
+.lp-form-group textarea {
+  min-height: 140px;
+  resize: none;
+}
+
+.lp-upload-box {
+  border: 3px dashed #c5c5ff;
+  border-radius: 25px;
+  padding: 40px;
+  text-align: center;
+  background: #f9f9ff;
+}
+
+.lp-check-btn {
+  width: 100%;
+  padding: 22px;
+  border-radius: 22px;
+  background: linear-gradient(90deg, #6c5ce7, #00cec9);
+  color: white;
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 20px;
+  border: none;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+}
+
+.lp-check-btn:hover {
+  transform: scale(1.02);
+}
+
+.lp-result-box {
+  margin-top: 40px;
+  background: #f5f8ff;
+  border-radius: 30px;
+  padding: 35px;
+  display: none;
+  animation: lp-fadeUp 0.5s ease;
+}
+
+.lp-result-title {
+  font-size: 34px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #6c5ce7;
+}
+
+.lp-result-text {
+  font-size: 22px;
+  line-height: 1.7;
+  color: #444;
+}
+
+.lp-success {
+  color: #00b894;
+  font-weight: 800;
+}
+
+.lp-error {
+  color: #ff7675;
+  font-weight: 800;
+}
+
+.lp-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.lp-stat-card {
+  background: white;
+  border-radius: 30px;
+  padding: 35px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.lp-stat-number {
+  font-size: 54px;
+  font-weight: 800;
+  color: #6c5ce7;
+}
+
+.lp-stat-label {
+  margin-top: 10px;
+  color: #666;
+  font-size: 20px;
+}
+
+.lp-footer {
+  padding: 60px;
+  text-align: center;
+  background: #ffffff;
+  font-family: "Nunito", sans-serif;
+}
+
+.lp-footer-title {
+  font-size: 34px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.lp-footer-text {
+  color: #666;
+  font-size: 18px;
+  line-height: 1.7;
+  max-width: 700px;
+  margin: auto;
+}
+
+.app-main {
+  background: var(--paper, #fff8f0);
+}
+
+body.lp-body {
+  font-family: "Nunito", sans-serif;
+  background: #f3f7ff;
+}
+
+@media (max-width: 1000px) {
+  .lp-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 700px) {
+  .lp-header {
+    padding: 20px;
+  }
+  .lp-hero {
+    padding: 150px 20px 80px;
+  }
+  .lp-section {
+    padding: 80px 20px;
+  }
+  .lp-homework-box {
+    padding: 25px;
+  }
+}

@@ -1,155 +1,162 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Школьный день — 3 класс, Москва 2026</title>
+    <title>Умный Дневник AI — 3 класс, Москва 2026</title>
     <meta
       name="description"
-      content="Ежедневные уроки и проверка домашних заданий для ученика 3 класса в Москве. Делайте задания на сайте, затем переносите ответы в тетрадь."
+      content="AI-проверка домашних заданий для ученика 3 класса. Математика, русский, английский и другие предметы."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/landing.css" />
     <link rel="stylesheet" href="./assets/styles.css" />
     <link rel="stylesheet" href="./assets/text-type.css" />
     <link rel="stylesheet" href="./assets/reviews.css" />
   </head>
-  <body>
-    <div class="ambient" aria-hidden="true">
-      <span class="ambient__blob ambient__blob--a"></span>
-      <span class="ambient__blob ambient__blob--b"></span>
-      <span class="ambient__blob ambient__blob--c"></span>
-    </div>
-    <div class="page-grain" aria-hidden="true"></div>
+  <body class="lp-body">
+    <a class="skip" href="#main">Перейти к урокам</a>
 
-    <a class="skip" href="#main">Перейти к содержанию</a>
-
-    <header class="topbar">
-      <div class="container topbar__inner">
-        <div class="brand" aria-label="Название проекта">
-          <span class="brand__logo" aria-hidden="true">
-            <svg viewBox="0 0 40 40" width="40" height="40" fill="none">
-              <rect x="4" y="6" width="32" height="28" rx="6" fill="currentColor" opacity="0.15" />
-              <path d="M10 14h20M10 20h14M10 26h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-            </svg>
-          </span>
-          <span class="brand__text">
-            <strong>Школьный день</strong>
-            <span>Москва · 3 класс · 2026</span>
-          </span>
-        </div>
-
-        <nav class="nav" aria-label="Навигация">
-          <a href="#today" class="nav__link">Сегодня</a>
-          <a href="#subjects" class="nav__link">Предметы</a>
-          <a href="#how" class="nav__link">Как учиться</a>
-          <a href="#reviews" class="nav__link">Отзывы</a>
-          <a href="#upload" class="nav__link">Учебники</a>
-          <a href="#journal" class="nav__link">Дневник</a>
-        </nav>
-
-        <div class="topbar__actions">
-          <button id="themeBtn" class="btn btn--ghost" type="button" aria-label="Тёмная тема">Вечер</button>
-          <a class="btn btn--primary" href="#today">К урокам</a>
-        </div>
-      </div>
+    <header class="lp-header">
+      <a href="#top" class="lp-logo">📘 Умный Дневник AI</a>
+      <nav class="lp-nav" aria-label="Навигация">
+        <a href="#top">Главная</a>
+        <a href="#subjects-preview">Предметы</a>
+        <a href="#homework-demo">Проверка ДЗ</a>
+        <a href="#today">Уроки</a>
+        <a href="#journal">Родителям</a>
+        <button id="themeBtn" class="lp-login-btn" type="button" style="background: #00cec9">🌙</button>
+        <a href="#today" class="lp-login-btn">Войти</a>
+      </nav>
     </header>
 
-    <main id="main">
-      <section class="hero">
-        <div class="container hero__grid">
-          <div class="hero__content reveal">
-            <p class="pill">
-              <span class="dot" aria-hidden="true"></span>
-              <span id="heroDate">—</span>
-            </p>
-            <h1 class="hero__title">
-              <span class="hero__line">Уроки 3 класса:</span>
-              <span class="hero__line hero__line--accent">
-                <span id="heroType" class="text-type hero__type">на сайте → в тетрадь</span>
-              </span>
-            </h1>
-            <p class="lead">
-              Каждый день — задания по школьным предметам с проверкой ответов. Сначала решаете здесь, потом аккуратно
-              переписываете в школьную тетрадь, как на уроке.
-            </p>
-
-            <div class="hero__cta">
-              <a class="btn btn--primary" href="#today">Начать сегодняшний день</a>
-              <a class="btn btn--ghost" href="#upload">Загрузить учебники</a>
-            </div>
-
-            <div class="stats" role="list">
-              <div class="stat" role="listitem">
-                <div class="stat__num" id="statSubjects">9</div>
-                <div class="stat__text">предметов в расписании Москвы</div>
-              </div>
-              <div class="stat" role="listitem">
-                <div class="stat__num" id="statProgress">0%</div>
-                <div class="stat__text">выполнено сегодня</div>
-              </div>
-              <div class="stat" role="listitem">
-                <div class="stat__num">2026</div>
-                <div class="stat__text">учебный год 2025/2026</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="hero__aside reveal reveal--delay">
-            <figure class="hero__figure">
-              <div class="hero__figure-frame">
-                <span class="hero__tape hero__tape--left" aria-hidden="true"></span>
-                <span class="hero__tape hero__tape--right" aria-hidden="true"></span>
-                <img
-                  class="hero__img"
-                  src="./assets/images/hero-teacher.jpg"
-                  width="640"
-                  height="640"
-                  alt="Учительница у доски показывает на задания — начните уроки сегодня"
-                  loading="eager"
-                  decoding="async"
-                />
-              </div>
-              <figcaption class="hero__caption">С нами учиться проще!</figcaption>
-            </figure>
-
-            <div class="hero__card" aria-label="Прогресс дня">
-              <span class="hero__sticker" aria-hidden="true">Москва 2026</span>
-              <div class="card card--planner">
-              <div class="card__header">
-                <strong>Сегодняшний план</strong>
-                <span class="badge" id="planBadge">0 / 0</span>
-              </div>
-              <p class="muted">Ученик: <strong id="studentNameDisplay">не указан</strong></p>
-
-              <div class="progress" aria-hidden="true">
-                <div class="progress__bar" id="dayProgressBar" style="width: 0%"></div>
-              </div>
-
-              <ul class="plan-mini" id="planMini"></ul>
-
-              <div class="hero__cardActions">
-                <button id="continueDayBtn" class="btn btn--primary" type="button">Продолжить</button>
-                <button id="settingsBtn" class="btn btn--ghost" type="button">Имя ученика</button>
-              </div>
-            </div>
-            </div>
-          </div>
+    <section class="lp-hero" id="top">
+      <div class="lp-hero-left">
+        <h1 class="lp-hero-title">
+          Проверка домашних заданий с помощью
+          <span class="lp-gradient">AI</span>
+        </h1>
+        <p class="lp-hero-text">
+          Умный помощник для учеников 3 класса. Проверяет домашние задания, объясняет ошибки и помогает учиться легко и
+          интересно.
+        </p>
+        <div class="lp-hero-buttons">
+          <a href="#today" class="lp-primary-btn">🚀 Начать обучение</a>
+          <a href="#subjects-preview" class="lp-secondary-btn">📚 Посмотреть предметы</a>
         </div>
-      </section>
+      </div>
+      <div class="lp-hero-right">
+        <div class="lp-mascot">
+          <img
+            src="./assets/images/hero-teacher.jpg"
+            alt="Умный помощник — учительница у доски"
+            width="360"
+            height="360"
+          />
+        </div>
+      </div>
+    </section>
 
+    <section class="lp-section" id="subjects-preview">
+      <h2 class="lp-section-title">📖 Предметы</h2>
+      <p class="lp-section-subtitle">Все учебники 3 класса — выбери предмет и урок ниже</p>
+      <div class="lp-subjects-grid">
+        <a href="#today" class="lp-subject-card">
+          <div class="lp-subject-icon">➗</div>
+          <div class="lp-subject-title">Математика</div>
+          <p class="lp-subject-text">Проверка примеров, задач, дробей и вычислений.</p>
+        </a>
+        <a href="#today" class="lp-subject-card">
+          <div class="lp-subject-icon">✍️</div>
+          <div class="lp-subject-title">Русский язык</div>
+          <p class="lp-subject-text">Орфография, правила, проверка ошибок.</p>
+        </a>
+        <a href="#today" class="lp-subject-card">
+          <div class="lp-subject-icon">🌍</div>
+          <div class="lp-subject-title">Окружающий мир</div>
+          <p class="lp-subject-text">Интерактивное объяснение тем и вопросов.</p>
+        </a>
+        <a href="#today" class="lp-subject-card">
+          <div class="lp-subject-icon">📚</div>
+          <div class="lp-subject-title">Литературное чтение</div>
+          <p class="lp-subject-text">Проверка ответов и понимания текста.</p>
+        </a>
+        <a href="#today" class="lp-subject-card">
+          <div class="lp-subject-icon">🇬🇧</div>
+          <div class="lp-subject-title">Английский язык</div>
+          <p class="lp-subject-text">Spotlight 3 — уроки и все задания на сайте.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="lp-section" id="homework-demo">
+      <h2 class="lp-section-title">🤖 Проверка домашнего задания</h2>
+      <p class="lp-section-subtitle">Демо: AI объяснит ошибки простым языком. Полная проверка — в разделе «Уроки»</p>
+      <div class="lp-homework-box">
+        <div class="lp-form-group">
+          <label for="demoSubject">Предмет</label>
+          <select id="demoSubject">
+            <option>Математика</option>
+            <option>Русский язык</option>
+            <option>Окружающий мир</option>
+            <option>Английский язык</option>
+          </select>
+        </div>
+        <div class="lp-form-group">
+          <label for="demoTask">Номер задания</label>
+          <input id="demoTask" type="text" placeholder="Например: № 125" />
+        </div>
+        <div class="lp-form-group">
+          <label for="demoAnswer">Ответ ученика</label>
+          <textarea id="demoAnswer" placeholder="Введите ответ здесь..."></textarea>
+        </div>
+        <div class="lp-form-group">
+          <label>Фото тетради</label>
+          <div class="lp-upload-box">📷 Перетащите фото сюда (скоро)</div>
+        </div>
+        <button type="button" class="lp-check-btn" onclick="checkHomework()">✨ Проверить домашнее задание</button>
+        <div class="lp-result-box" id="resultBox">
+          <div class="lp-result-title">Результат проверки</div>
+          <div class="lp-result-text" id="resultText"></div>
+        </div>
+      </div>
+      <p style="text-align: center; margin-top: 24px">
+        <a href="#today" class="lp-primary-btn" style="animation: none">Перейти к настоящим урокам →</a>
+      </p>
+    </section>
+
+    <section class="lp-section" id="achievements">
+      <h2 class="lp-section-title">🏆 Достижения</h2>
+      <p class="lp-section-subtitle">Следи за своим прогрессом</p>
+      <div class="lp-stats">
+        <div class="lp-stat-card">
+          <div class="lp-stat-number" id="lpStatCorrect">0</div>
+          <div class="lp-stat-label">Правильных ответов</div>
+        </div>
+        <div class="lp-stat-card">
+          <div class="lp-stat-number" id="lpStatStreak">0</div>
+          <div class="lp-stat-label">Дней подряд</div>
+        </div>
+        <div class="lp-stat-card">
+          <div class="lp-stat-number" id="lpStatProgress">0%</div>
+          <div class="lp-stat-label">Прогресс сегодня</div>
+        </div>
+        <div class="lp-stat-card">
+          <div class="lp-stat-number">⭐</div>
+          <div class="lp-stat-label">Награды</div>
+        </div>
+      </div>
+    </section>
+
+    <main id="main" class="app-main">
       <section id="today" class="section section--alt">
         <div class="container">
           <div class="section__head scroll-reveal">
             <span class="section__tag">Расписание</span>
             <h2>Сегодняшние уроки</h2>
-            <p class="muted" id="todaySubtitle">Откройте предмет, решите задания на экране, затем перенесите в тетрадь.</p>
+            <p class="muted" id="todaySubtitle">Выберите предмет → урок → все задания. Ответ в поле под заданием.</p>
           </div>
-
           <div class="today-bar card scroll-reveal scroll-reveal--d1">
             <div>
               <div class="today-bar__label muted">Дата</div>
@@ -161,7 +168,6 @@
             </div>
             <button id="resetDayBtn" class="btn btn--ghost" type="button">Сбросить день</button>
           </div>
-
           <div class="subject-grid" id="todayGrid" role="list"></div>
         </div>
       </section>
@@ -175,7 +181,6 @@
               <p class="muted" id="lessonMeta">—</p>
             </div>
           </div>
-
           <div class="lesson-layout">
             <aside class="lesson-aside card">
               <h3>Шаги урока</h3>
@@ -185,36 +190,30 @@
                 <li>Перенести в тетрадь</li>
               </ol>
               <p class="muted lesson-aside__note" id="lessonBookRef">Учебник: —</p>
-              <button id="markNotebookBtn" class="btn btn--primary" type="button" disabled>
-                Я переписал в тетрадь
-              </button>
+              <button id="markNotebookBtn" class="btn btn--primary" type="button" disabled>Я переписал в тетрадь</button>
             </aside>
-
             <div class="lesson-main">
               <div class="lesson-guide card" id="lessonGuide">
-                <p class="lesson-guide__title"><strong>Как сделать домашку на сайте</strong></p>
+                <p class="lesson-guide__title"><strong>Как сделать домашку</strong></p>
                 <ol class="lesson-guide__steps muted">
-                  <li><strong>Выберите урок</strong> (модуль) — откроются все задания этого урока.</li>
-                  <li>Откройте рабочую тетрадь по ссылкам слева и найдите нужные страницы.</li>
-                  <li><strong>Напишите ответ в поле под заданием</strong> и нажмите «Проверить».</li>
-                  <li>Внизу появится <strong>результат</strong> — сколько ответов верно.</li>
-                  <li>Перепишите верные ответы в школьную тетрадь.</li>
+                  <li><strong>Выберите урок</strong> — откроются все задания.</li>
+                  <li>Откройте тетрадь по ссылкам слева.</li>
+                  <li><strong>Ответ в поле</strong> → «Проверить».</li>
+                  <li>Внизу — <strong>результат</strong> по уроку.</li>
                 </ol>
               </div>
-              <div id="lessonMaterials" class="lesson-materials card is-hidden" aria-label="Материалы урока"></div>
-              <div id="lessonPicker" class="lesson-picker card is-hidden" aria-label="Выбор урока"></div>
+              <div id="lessonMaterials" class="lesson-materials card is-hidden"></div>
+              <div id="lessonPicker" class="lesson-picker card is-hidden"></div>
               <div id="lessonToolbar" class="lesson-toolbar card is-hidden">
                 <div class="lesson-toolbar__row">
                   <label class="field lesson-toolbar__field">
                     <span class="field__label">Урок</span>
-                    <select class="input" id="lessonSelect" aria-label="Выбрать урок"></select>
+                    <select class="input" id="lessonSelect"></select>
                   </label>
                   <button id="changeLessonBtn" class="btn btn--ghost" type="button">Все уроки</button>
                 </div>
               </div>
-              <div id="lessonEmpty" class="card muted lesson-empty is-hidden">
-                Заданий пока нет. Родитель может загрузить файл с заданиями в разделе «Учебники».
-              </div>
+              <div id="lessonEmpty" class="card muted lesson-empty is-hidden"></div>
               <div id="taskList" class="task-list"></div>
               <div id="homeworkResult" class="homework-result is-hidden" aria-live="polite"></div>
             </div>
@@ -227,7 +226,6 @@
           <div class="section__head scroll-reveal">
             <span class="section__tag">Программа</span>
             <h2>Все предметы 3 класса</h2>
-            <p class="muted">Программа московских школ. Письменные задания проверяются на сайте после загрузки тетрадей.</p>
           </div>
           <div class="subject-grid subject-grid--catalog" id="catalogGrid" role="list"></div>
         </div>
@@ -238,23 +236,22 @@
           <div class="section__head scroll-reveal">
             <span class="section__tag">Инструкция</span>
             <h2>Как проходит день</h2>
-            <p class="muted">Привычка: экран → проверка → тетрадь. Так проще не забыть перенести ответы.</p>
           </div>
           <div class="grid3">
             <article class="feature feature--step scroll-reveal scroll-reveal--d1">
-              <span class="feature__num" aria-hidden="true">01</span>
+              <span class="feature__num">01</span>
               <h3>Урок на сайте</h3>
-              <p>Читаете задание, вводите ответ, нажимаете «Проверить». Ошибки можно исправить с подсказкой.</p>
+              <p>Решаете задания, нажимаете «Проверить».</p>
             </article>
             <article class="feature feature--step scroll-reveal scroll-reveal--d2">
-              <span class="feature__num" aria-hidden="true">02</span>
+              <span class="feature__num">02</span>
               <h3>Проверка</h3>
-              <p>Сайт сверяет ответ с ключом из рабочей тетради (после того как вы загрузите задания).</p>
+              <p>Сайт сверяет ответ с учебником.</p>
             </article>
             <article class="feature feature--step scroll-reveal scroll-reveal--d3">
-              <span class="feature__num" aria-hidden="true">03</span>
+              <span class="feature__num">03</span>
               <h3>Тетрадь</h3>
-              <p>Аккуратно переписываете примеры и ответы в школьную тетрадь. Отмечаете шаг выполненным.</p>
+              <p>Переписываете в школьную тетрадь.</p>
             </article>
           </div>
         </div>
@@ -263,18 +260,13 @@
       <section id="reviews" class="section section--reviews section--alt">
         <div class="container reviews-intro scroll-reveal">
           <span class="section__tag">Отзывы</span>
-          <h2>Что говорят родители и ученики</h2>
-          <p class="muted reviews-intro__lead">
-            Прокрутите вниз — карточки с отзывами сменяют друг друга, как стопка записок на парте.
-          </p>
+          <h2>Что говорят родители</h2>
         </div>
-
-        <div class="reviews-scroll" id="reviewsScroll" aria-label="Отзывы с прокруткой">
+        <div class="reviews-scroll" id="reviewsScroll">
           <div class="reviews-sticky">
             <div class="reviews-stack" id="reviewsStack" role="list"></div>
           </div>
         </div>
-        <p class="reviews-hint muted container scroll-reveal">↓ Листайте, чтобы прочитать все отзывы</p>
       </section>
 
       <section id="upload" class="section">
@@ -282,29 +274,21 @@
           <div class="section__head scroll-reveal">
             <span class="section__tag">Для родителей</span>
             <h2>Учебники и задания</h2>
-            <p class="muted">
-              Учебники PDF лежат в <code>content/textbooks/</code>. Задания для проверки — в JSON (можно добавить свои).
-              Ученик отвечает в разделе <a href="#today">Сегодня</a> → предмет → поле под заданием → «Проверить».
-            </p>
           </div>
-
           <div class="grid2 scroll-reveal scroll-reveal--d1">
             <div class="card upload-zone" id="uploadZone">
               <h3>Загрузить задания (JSON)</h3>
-              <p class="muted">Выберите файл <strong>tasks.json</strong> с заданиями по вашим учебникам.</p>
               <input id="tasksFileInput" type="file" accept=".json,application/json" hidden />
               <button id="pickTasksBtn" class="btn btn--primary" type="button">Выбрать файл</button>
-              <button id="loadSampleBtn" class="btn btn--ghost" type="button">Подгрузить пример с сервера</button>
-              <button id="loadSpotlightBtn" class="btn btn--ghost" type="button">Обновить задания Spotlight 3</button>
-              <div id="uploadMsg" class="form__msg" role="status"></div>
+              <button id="loadSampleBtn" class="btn btn--ghost" type="button">Пример</button>
+              <button id="loadSpotlightBtn" class="btn btn--ghost" type="button">Spotlight 3</button>
+              <div id="uploadMsg" class="form__msg"></div>
             </div>
-
             <div class="card">
               <h3>Каталог учебников</h3>
-              <p class="muted">Ссылки на PDF и список заданий по предметам. Сейчас подключён Spotlight 3 (английский).</p>
-              <div id="catalogList" class="list muted">Пока пусто — используются демо‑задания.</div>
+              <div id="catalogList" class="list muted"></div>
               <details class="schema-details">
-                <summary>Формат файла заданий</summary>
+                <summary>Формат JSON</summary>
                 <pre class="schema-pre" id="schemaPre"></pre>
               </details>
             </div>
@@ -315,9 +299,8 @@
       <section id="journal" class="section section--alt">
         <div class="container">
           <div class="section__head scroll-reveal">
-            <span class="section__tag">История</span>
+            <span class="section__tag">Родителям</span>
             <h2>Дневник прогресса</h2>
-            <p class="muted">Сохраняется в браузере на этом устройстве.</p>
           </div>
           <div class="grid2 scroll-reveal scroll-reveal--d1">
             <div class="card">
@@ -334,39 +317,34 @@
                 <input class="input" id="studentNameInput" placeholder="Например: Миша" />
               </label>
               <button id="saveStudentBtn" class="btn btn--primary" type="button">Сохранить</button>
-              <p class="muted" style="margin-top: 12px">
-                Город: Москва · Класс: 3 · Год: 2026 (учебный 2025/2026)
-              </p>
             </div>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="container footer__inner">
-        <div class="muted">Школьный день — личный помощник для 3 класса. Данные хранятся локально в браузере.</div>
-        <a class="muted" href="#main">Наверх</a>
-      </div>
+    <footer class="lp-footer">
+      <div class="lp-footer-title">📘 Умный Дневник AI</div>
+      <p class="lp-footer-text">
+        Современная платформа для проверки домашних заданий учеников 3 класса. Москва · 2025/2026 · Данные хранятся в
+        браузере.
+      </p>
+      <p style="margin-top: 16px"><a href="#top">Наверх ↑</a></p>
     </footer>
 
     <div id="celebrateOverlay" class="celebrate" aria-hidden="true">
-      <div id="confettiLayer" class="celebrate__confetti" aria-hidden="true"></div>
+      <div id="confettiLayer" class="celebrate__confetti"></div>
       <div class="celebrate__card">
         <p class="celebrate__tag">Ура!</p>
         <h2 class="celebrate__title">День завершён!</h2>
-        <p class="celebrate__text">Все предметы на сегодня сделаны. Отличная работа!</p>
-        <button type="button" class="btn btn--primary" data-celebrate-close>Ура, спасибо!</button>
+        <button type="button" class="btn btn--primary" data-celebrate-close>Ура!</button>
       </div>
     </div>
 
     <dialog id="settingsDialog" class="dialog">
       <form method="dialog" class="dialog__inner">
         <h3>Имя ученика</h3>
-        <label class="field">
-          <span class="field__label">Как подписывать уроки</span>
-          <input class="input" id="studentNameDialog" />
-        </label>
+        <input class="input" id="studentNameDialog" />
         <div class="dialog__actions">
           <button class="btn btn--ghost" value="cancel" type="submit">Отмена</button>
           <button class="btn btn--primary" id="saveStudentDialogBtn" value="default" type="submit">Сохранить</button>
@@ -376,16 +354,29 @@
 
     <script type="module" src="./assets/app.js"></script>
     <script>
+      function checkHomework() {
+        var resultBox = document.getElementById("resultBox");
+        var resultText = document.getElementById("resultText");
+        var answer = (document.getElementById("demoAnswer") || {}).value || "";
+        resultBox.style.display = "block";
+        if (/^75$|^42$/.test(answer.trim())) {
+          resultText.innerHTML =
+            '<span class="lp-success">✅ Верно!</span><br><br>Молодец! Можно перейти к <a href="#today">настоящим урокам</a>.';
+        } else {
+          resultText.innerHTML =
+            '<span class="lp-error">💡 Почти!</span><br><br>AI объяснение:<br><br>Перечитай условие и проверь вычисления.<br><br>Похожая задача: 36 + 17 = ?<br><br><a href="#today">Решать в разделе «Уроки» →</a>';
+        }
+        resultBox.scrollIntoView({ behavior: "smooth" });
+      }
+
       window.addEventListener("load", function () {
         setTimeout(function () {
           var grid = document.getElementById("todayGrid");
           if (!grid || grid.querySelector(".subject-card")) return;
           grid.innerHTML =
-            '<p class="muted card" style="grid-column:1/-1;padding:20px">' +
-            "Карточки уроков не загрузились. Откройте сайт через локальный сервер " +
-            "(<code>node .\\scripts\\dev.mjs</code>), а не двойным щелчком по файлу index.html." +
-            "</p>";
+            '<p class="muted card" style="grid-column:1/-1;padding:20px">Запустите <code>node .\\scripts\\dev.mjs</code> и откройте http://localhost:5173</p>';
         }, 600);
+
       });
     </script>
   </body>
