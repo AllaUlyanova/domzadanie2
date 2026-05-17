@@ -701,6 +701,7 @@ function boot() {
   renderCatalogGrid();
   updateDashboard();
   renderJournal();
+  renderCatalog();
   renderReviews();
   initHeroHeadline();
   initScrollReveal();

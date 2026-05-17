@@ -207,7 +207,7 @@
             <h2>Все предметы 3 класса</h2>
             <p class="muted">Программа московских школ. Письменные задания проверяются на сайте после загрузки тетрадей.</p>
           </div>
-          <div class="subject-grid subject-grid--catalog scroll-reveal scroll-reveal--d1" id="catalogGrid" role="list"></div>
+          <div class="subject-grid subject-grid--catalog" id="catalogGrid" role="list"></div>
         </div>
       </section>
 
@@ -352,5 +352,18 @@
     </dialog>
 
     <script type="module" src="./assets/app.js"></script>
+    <script>
+      window.addEventListener("load", function () {
+        setTimeout(function () {
+          var grid = document.getElementById("todayGrid");
+          if (!grid || grid.querySelector(".subject-card")) return;
+          grid.innerHTML =
+            '<p class="muted card" style="grid-column:1/-1;padding:20px">' +
+            "Карточки уроков не загрузились. Откройте сайт через локальный сервер " +
+            "(<code>node .\\scripts\\dev.mjs</code>), а не двойным щелчком по файлу index.html." +
+            "</p>";
+        }, 600);
+      });
+    </script>
   </body>
 </html>
