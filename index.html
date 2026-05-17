@@ -194,14 +194,24 @@
               <div class="lesson-guide card" id="lessonGuide">
                 <p class="lesson-guide__title"><strong>Как сделать домашку на сайте</strong></p>
                 <ol class="lesson-guide__steps muted">
-                  <li>Откройте учебник или рабочую тетрадь по ссылкам слева.</li>
-                  <li>Найдите задание по номеру страницы и упражнения.</li>
+                  <li><strong>Выберите урок</strong> (модуль) — откроются все задания этого урока.</li>
+                  <li>Откройте рабочую тетрадь по ссылкам слева и найдите нужные страницы.</li>
                   <li><strong>Напишите ответ в поле под заданием</strong> и нажмите «Проверить».</li>
                   <li>Внизу появится <strong>результат</strong> — сколько ответов верно.</li>
                   <li>Перепишите верные ответы в школьную тетрадь.</li>
                 </ol>
               </div>
               <div id="lessonMaterials" class="lesson-materials card is-hidden" aria-label="Материалы урока"></div>
+              <div id="lessonPicker" class="lesson-picker card is-hidden" aria-label="Выбор урока"></div>
+              <div id="lessonToolbar" class="lesson-toolbar card is-hidden">
+                <div class="lesson-toolbar__row">
+                  <label class="field lesson-toolbar__field">
+                    <span class="field__label">Урок</span>
+                    <select class="input" id="lessonSelect" aria-label="Выбрать урок"></select>
+                  </label>
+                  <button id="changeLessonBtn" class="btn btn--ghost" type="button">Все уроки</button>
+                </div>
+              </div>
               <div id="lessonEmpty" class="card muted lesson-empty is-hidden">
                 Заданий пока нет. Родитель может загрузить файл с заданиями в разделе «Учебники».
               </div>

@@ -1575,6 +1575,73 @@ html.motion-ready .scroll-reveal.is-visible {
   margin-top: 2px;
 }
 
+.lesson-picker__title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+.lesson-picker__lead {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.lesson-picker__grid {
+  display: grid;
+  gap: 12px;
+}
+.lesson-picker__card {
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  padding: 16px 18px;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.lesson-picker__card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.lesson-picker__name {
+  font-family: var(--font-display);
+  font-size: 17px;
+}
+.lesson-picker__count {
+  font-size: 14px;
+  font-weight: 600;
+}
+.lesson-picker.is-hidden,
+.lesson-toolbar.is-hidden {
+  display: none;
+}
+
+.lesson-toolbar {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+}
+.lesson-toolbar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+.lesson-toolbar__field {
+  flex: 1;
+  min-width: 200px;
+  margin: 0;
+}
+
+.task-list__heading {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .homework-result {
   margin-top: 18px;
 }

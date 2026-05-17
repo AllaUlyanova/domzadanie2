@@ -8,6 +8,8 @@
     {
       "id": "en-sp-1-hello",
       "subjectId": "english",
+      "lessonId": "m1",
+      "lessonTitle": "Module 1. Hello!",
       "unit": 1,
       "unitTitle": "Module 1. Hello!",
       "textbook": "Spotlight 3 — Учебник",
@@ -24,6 +26,7 @@
     {
       "id": "en-sp-1-goodbye",
       "subjectId": "english",
+      "lessonId": "m1",
       "unit": 1,
       "unitTitle": "Module 1. Hello!",
       "textbook": "Spotlight 3 — Учебник",
@@ -40,6 +43,7 @@
     {
       "id": "en-sp-1-name",
       "subjectId": "english",
+      "lessonId": "m1",
       "unit": 1,
       "unitTitle": "Module 1. Hello!",
       "textbook": "Spotlight 3 — Учебник",
@@ -56,6 +60,7 @@
     {
       "id": "en-sp-1-spell",
       "subjectId": "english",
+      "lessonId": "m1",
       "unit": 1,
       "unitTitle": "Module 1. Hello!",
       "textbook": "Spotlight 3 — Учебник",
@@ -72,6 +77,7 @@
     {
       "id": "en-sp-1-numbers",
       "subjectId": "english",
+      "lessonId": "m1",
       "unit": 1,
       "unitTitle": "Module 1. Hello!",
       "textbook": "Spotlight 3 — Учебник",
@@ -88,6 +94,8 @@
     {
       "id": "en-sp-2-pen",
       "subjectId": "english",
+      "lessonId": "m2",
+      "lessonTitle": "Module 2. School",
       "unit": 2,
       "unitTitle": "Module 2. School",
       "textbook": "Spotlight 3 — Учебник",
@@ -104,6 +112,7 @@
     {
       "id": "en-sp-2-a-an",
       "subjectId": "english",
+      "lessonId": "m2",
       "unit": 2,
       "unitTitle": "Module 2. School",
       "textbook": "Spotlight 3 — Учебник",
@@ -120,6 +129,7 @@
     {
       "id": "en-sp-2-plural",
       "subjectId": "english",
+      "lessonId": "m2",
       "unit": 2,
       "unitTitle": "Module 2. School",
       "textbook": "Spotlight 3 — Учебник",
@@ -136,6 +146,7 @@
     {
       "id": "en-sp-2-this-that",
       "subjectId": "english",
+      "lessonId": "m2",
       "unit": 2,
       "unitTitle": "Module 2. School",
       "textbook": "Spotlight 3 — Учебник",
@@ -152,6 +163,8 @@
     {
       "id": "en-sp-sb-1",
       "subjectId": "english",
+      "lessonId": "sb",
+      "lessonTitle": "Сборник упражнений",
       "unit": 1,
       "unitTitle": "Сборник упражнений",
       "textbook": "Spotlight 3 — Сборник",
