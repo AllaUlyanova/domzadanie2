@@ -19,6 +19,16 @@ import {
   maybeCelebrateDay,
   clearCelebration,
 } from "./motion.js";
+import {
+  loadAllCurricula,
+  getLessonsData,
+  filterTasksByLessonKey,
+  findLesson,
+  normalizeLessonKey,
+  parseRouteHash,
+  setLessonRoute,
+  clearLessonRoute,
+} from "./lessons-engine.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -175,37 +185,6 @@ function tasksForSubject(subjectId, dateKey = todayKey()) {
   });
 }
 
-function lessonKey(task) {
-  if (task.lessonId) return String(task.lessonId);
-  if (task.unit != null && task.unitTitle) return `u${task.unit}`;
-  if (task.unit != null) return `u${task.unit}`;
-  return "default";
-}
-
-function lessonsFromTasks(tasks) {
-  const map = new Map();
-  for (const t of tasks) {
-    const key = lessonKey(t);
-    if (!map.has(key)) {
-      map.set(key, {
-        key,
-        title: t.lessonTitle || t.unitTitle || (t.unit != null ? `Урок ${t.unit}` : "Урок"),
-        unit: t.unit ?? null,
-        count: 0,
-      });
-    }
-    map.get(key).count += 1;
-  }
-  return [...map.values()].sort((a, b) => {
-    if (a.unit != null && b.unit != null && a.unit !== b.unit) return a.unit - b.unit;
-    return a.title.localeCompare(b.title, "ru");
-  });
-}
-
-function filterTasksByLesson(tasks, key) {
-  return tasks.filter((t) => lessonKey(t) === key);
-}
-
 function savedLessonKey(subjectId) {
   return localStorage.getItem(`${KEYS.lesson}_${subjectId}`);
 }
@@ -218,15 +197,11 @@ let activeLessonKey = null;
 
 function getLessonContext(subjectId, dateKey = todayKey()) {
   const all = tasksForSubject(subjectId, dateKey);
-  const lessons = lessonsFromTasks(all);
+  const lessons = getLessonsData(subjectId, all);
   if (!lessons.length) return { all, lessons, lesson: null, tasks: [] };
-  if (lessons.length === 1) {
-    const lesson = lessons[0];
-    return { all, lessons, lesson, tasks: filterTasksByLesson(all, lesson.key) };
-  }
-  const key = activeLessonKey || savedLessonKey(subjectId);
-  const lesson = lessons.find((l) => l.key === key) || null;
-  const tasks = lesson ? filterTasksByLesson(all, lesson.key) : [];
+  const key = normalizeLessonKey(activeLessonKey || savedLessonKey(subjectId));
+  const lesson = findLesson(lessons, key);
+  const tasks = lesson ? filterTasksByLessonKey(all, lesson.key) : [];
   return { all, lessons, lesson, tasks };
 }
 
@@ -345,13 +320,11 @@ function buildSubjectCard(subject, mode, dateKey, index = 0) {
   card.dataset.subjectId = subject.id;
   card.style.setProperty("--subject-accent", subject.accent);
 
+  const lessonsMeta = getLessonsData(subject.id, tasks);
   const metaText = subject.written
-    ? (() => {
-        const les = lessonsFromTasks(tasks);
-        return les.length > 1
-          ? `${les.length} уроков · ${doneCount}/${tasks.length || 0} заданий`
-          : `${doneCount}/${tasks.length || 0} заданий`;
-      })()
+    ? lessonsMeta.length > 1
+      ? `${lessonsMeta.length} уроков · ${doneCount}/${tasks.length || 0} заданий`
+      : `${doneCount}/${tasks.length || 0} заданий`
     : subject.textbookHint;
 
   card.innerHTML = `
@@ -574,18 +547,23 @@ function renderLessonPicker(subject, lessons, allTasks) {
   picker.innerHTML = `
     <h3 class="lesson-picker__title">Выберите урок</h3>
     <p class="muted lesson-picker__lead">
-      После выбора откроется <strong>весь список заданий</strong> этого урока — все упражнения на одной странице.
+      Все <strong>${lessons.length}</strong> уроков программы. Нажмите карточку — откроются задания на сайте или PDF учебника.
     </p>
     <div class="lesson-picker__grid" role="list">
       ${lessons
         .map((l) => {
-          const lessonTasks = filterTasksByLesson(allTasks, l.key);
+          const lessonTasks = filterTasksByLessonKey(allTasks, l.key);
           const done = lessonTasks.filter((t) => sub.tasks[t.id]?.correct).length;
+          const cardClass = l.hasTasks ? "lesson-picker__card" : "lesson-picker__card lesson-picker__card--book";
+          const countLabel = l.hasTasks
+            ? `${lessonTasks.length} заданий на сайте`
+            : `📖 ${l.partLabel || "Учебник"}`;
+          const progLabel = l.hasTasks ? `${done} / ${lessonTasks.length} верно` : "Открыть урок";
           return `
-        <button type="button" class="lesson-picker__card" role="listitem" data-lesson-key="${escapeHtml(l.key)}">
+        <button type="button" class="${cardClass}" role="listitem" data-lesson-key="${escapeHtml(l.key)}" data-lesson-slug="${escapeHtml(l.slug)}">
           <strong class="lesson-picker__name">${escapeHtml(l.title)}</strong>
-          <span class="lesson-picker__count">${lessonTasks.length} заданий</span>
-          <span class="lesson-picker__prog muted">${done} / ${lessonTasks.length} верно</span>
+          <span class="lesson-picker__count">${countLabel}</span>
+          <span class="lesson-picker__prog muted">${progLabel}</span>
         </button>`;
         })
         .join("")}
@@ -593,7 +571,10 @@ function renderLessonPicker(subject, lessons, allTasks) {
   `;
 
   picker.querySelectorAll("[data-lesson-key]").forEach((btn) => {
-    btn.addEventListener("click", () => selectLesson(subject.id, btn.dataset.lessonKey));
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.lessonKey;
+      if (key) selectLesson(subject.id, key);
+    });
   });
   syncLessonGuide("pick-lesson", { books: getCatalogBooks().filter((b) => b.subjectId === subject.id) });
 }
@@ -601,46 +582,82 @@ function renderLessonPicker(subject, lessons, allTasks) {
 function populateLessonSelect(subjectId, lessons, currentKey) {
   const select = $("#lessonSelect");
   const toolbar = $("#lessonToolbar");
-  if (!select || !toolbar || lessons.length <= 1) {
+  if (!select || !toolbar || lessons.length < 2) {
     toolbar?.classList.add("is-hidden");
     return;
   }
   toolbar.classList.remove("is-hidden");
+  const norm = normalizeLessonKey(currentKey);
   select.innerHTML = lessons
-    .map(
-      (l) =>
-        `<option value="${escapeHtml(l.key)}" ${l.key === currentKey ? "selected" : ""}>${escapeHtml(l.title)} (${l.count} зад.)</option>`,
-    )
+    .map((l) => {
+      const label = l.hasTasks ? `${l.count} зад.` : "учебник";
+      return `<option value="${escapeHtml(l.key)}" ${l.key === norm ? "selected" : ""}>${escapeHtml(l.title)} (${label})</option>`;
+    })
     .join("");
+}
+
+function getBookForLesson(subjectId, lesson) {
+  const books = getCatalogBooks().filter((b) => b.subjectId === subjectId);
+  if (lesson?.partBookId) return books.find((b) => b.id === lesson.partBookId) || books[0];
+  return books[0] || null;
+}
+
+function renderLessonEmpty(subject, lesson) {
+  const empty = $("#lessonEmpty");
+  if (!empty) return;
+  const book = getBookForLesson(subject.id, lesson);
+  empty.classList.remove("is-hidden");
+  empty.innerHTML = `
+    <p><strong>${escapeHtml(lesson.title)}</strong></p>
+    <p class="muted">Интерактивных заданий для этого урока на сайте пока нет. Откройте учебник, выполните задания в тетради и нажмите «Я переписал в тетрадь».</p>
+    ${
+      book
+        ? `<p><a class="dz-btn dz-btn--primary" href="./${escapeHtml(book.file || "")}" target="_blank" rel="noopener">📖 ${escapeHtml(book.title)}</a></p>`
+        : ""
+    }
+  `;
 }
 
 function selectLesson(subjectId, lessonKey) {
   const subject = getSubject(subjectId);
   if (!subject) return;
 
-  activeLessonKey = lessonKey;
-  saveLessonKey(subjectId, lessonKey);
+  const normKey = normalizeLessonKey(lessonKey);
+  activeLessonKey = normKey;
+  saveLessonKey(subjectId, normKey);
+  setLessonRoute(subjectId, normKey);
 
   $("#lessonPicker")?.classList.add("is-hidden");
 
   const all = tasksForSubject(subjectId);
-  const lessons = lessonsFromTasks(all);
-  const lesson = lessons.find((l) => l.key === lessonKey);
-  const tasks = filterTasksByLesson(all, lessonKey);
+  const lessons = getLessonsData(subjectId, all);
+  const lesson = findLesson(lessons, normKey);
+  const tasks = filterTasksByLessonKey(all, normKey);
 
-  populateLessonSelect(subjectId, lessons, lessonKey);
+  populateLessonSelect(subjectId, lessons, normKey);
 
   const pages = [...new Set(tasks.map((t) => t.page).filter((p) => p != null))].sort(
     (a, b) => Number(a) - Number(b),
   );
   $("#lessonMeta").textContent = lesson
-    ? `${lesson.title} · ${tasks.length} заданий${pages.length ? ` · стр. ${pages.join(", ")}` : ""}`
+    ? tasks.length
+      ? `${lesson.title} · ${tasks.length} заданий${pages.length ? ` · стр. ${pages.join(", ")}` : ""}`
+      : `${lesson.title} · работа по учебнику`
     : subject.workbookHint;
 
   const ref = tasks[0];
-  $("#lessonBookRef").textContent = `Учебник: ${ref?.textbook || subject.textbookHint}`;
+  const book = lesson ? getBookForLesson(subjectId, lesson) : null;
+  $("#lessonBookRef").textContent = book
+    ? `Учебник: ${book.title}`
+    : `Учебник: ${ref?.textbook || subject.textbookHint}`;
 
-  renderTasks(subject, tasks, { inLesson: true });
+  if (!tasks.length && lesson) {
+    renderLessonEmpty(subject, lesson);
+    $("#taskList").innerHTML = "";
+    $("#homeworkResult")?.classList.add("is-hidden");
+  } else {
+    renderTasks(subject, tasks, { inLesson: true, lesson });
+  }
   updateNotebookButton(subject, tasks);
   syncLessonSteps(subject, tasks);
   syncLessonGuide("tasks", { lessonsCount: lessons.length });
@@ -650,9 +667,10 @@ function showLessonPickerAgain() {
   if (!activeSubjectId) return;
   const subject = getSubject(activeSubjectId);
   const all = tasksForSubject(activeSubjectId);
-  const lessons = lessonsFromTasks(all);
-  if (lessons.length <= 1) return;
+  const lessons = getLessonsData(activeSubjectId, all);
+  if (!lessons.length) return;
   activeLessonKey = null;
+  clearLessonRoute();
   renderLessonPicker(subject, lessons, all);
 }
 
@@ -785,11 +803,11 @@ function openLesson(subjectId) {
   $("#lessonTitle").textContent = subject.name;
 
   const allTasks = tasksForSubject(subjectId);
-  const lessons = lessonsFromTasks(allTasks);
+  const lessons = getLessonsData(subjectId, allTasks);
 
   renderLessonMaterials(subjectId);
 
-  if (!allTasks.length) {
+  if (!lessons.length && !allTasks.length) {
     $("#lessonPicker")?.classList.add("is-hidden");
     $("#lessonToolbar")?.classList.add("is-hidden");
     $("#lessonMeta").textContent = subject.workbookHint;
@@ -801,24 +819,27 @@ function openLesson(subjectId) {
     return;
   }
 
-  if (lessons.length > 1) {
-    const saved = savedLessonKey(subjectId);
-    if (saved && lessons.some((l) => l.key === saved)) {
-      selectLesson(subjectId, saved);
-    } else {
-      $("#lessonMeta").textContent = `${lessons.length} уроков · выберите нужный`;
-      $("#lessonBookRef").textContent = `Учебник: ${subject.textbookHint}`;
-      renderLessonPicker(subject, lessons, allTasks);
-    }
+  const route = parseRouteHash();
+  const routeKey = route?.subjectId === subjectId ? route.lessonKey : null;
+  const saved = savedLessonKey(subjectId);
+  const savedNorm = saved ? normalizeLessonKey(saved) : null;
+  const targetKey = routeKey || savedNorm;
+  const targetLesson = targetKey ? findLesson(lessons, targetKey) : null;
+
+  if (targetLesson) {
+    selectLesson(subjectId, targetLesson.key);
     return;
   }
 
-  selectLesson(subjectId, lessons[0].key);
+  $("#lessonMeta").textContent = `${lessons.length} уроков · выберите нужный`;
+  $("#lessonBookRef").textContent = `Учебник: ${subject.textbookHint}`;
+  renderLessonPicker(subject, lessons, allTasks);
 }
 
 function closeLesson() {
   activeSubjectId = null;
   activeLessonKey = null;
+  clearLessonRoute();
   const section = $("#lesson");
   section?.classList.add("is-hidden");
   section?.setAttribute("aria-hidden", "true");
@@ -841,8 +862,8 @@ function updateNotebookButton(subject, tasks) {
   }
 
   if (!tasks.length) {
-    btn.disabled = true;
-    btn.textContent = "Сначала загрузите задания";
+    btn.disabled = false;
+    btn.textContent = sub.notebookDone ? "В тетради ✓" : "Я переписал в тетрадь";
     return;
   }
 
@@ -857,12 +878,15 @@ function renderTasks(subject, tasks, opts = {}) {
 
   list.innerHTML = "";
   if (!tasks.length) {
-    empty.classList.remove("is-hidden");
-    empty.textContent = subject.written
-      ? "Заданий пока нет для этого предмета. Для английского убедитесь, что сайт открыт через локальный сервер."
-      : "Письменных заданий на сайте нет. Выполните задание учителя и нажмите «Отметить выполнение».";
+    if (opts.lesson) {
+      renderLessonEmpty(subject, opts.lesson);
+    } else {
+      empty.classList.remove("is-hidden");
+      empty.textContent = subject.written
+        ? "Заданий пока нет для этого предмета. Откройте предмет с каталогом уроков (математика, английский)."
+        : "Письменных заданий на сайте нет. Выполните задание учителя и нажмите «Отметить выполнение».";
+    }
     $("#homeworkResult")?.classList.add("is-hidden");
-    $("#lessonMaterials")?.classList.add("is-hidden");
     return;
   }
   empty.classList.add("is-hidden");
@@ -987,13 +1011,12 @@ $("#markNotebookBtn")?.addEventListener("click", () => {
   const tasks = getLessonContext(activeSubjectId).tasks;
   updateNotebookButton(subject, tasks);
   syncLessonSteps(subject, tasks);
-  renderTodayGrid();
+  renderSubjectsGrid();
   if (!wasDone) {
     const card = document.querySelector(`.dz-subject-card[data-subject-id="${activeSubjectId}"]`);
     popSubjectStamp(card);
   }
   updateDashboard();
-  renderJournal();
 });
 
 $("#resetDayBtn")?.addEventListener("click", () => {
@@ -1197,9 +1220,25 @@ function boot() {
 }
 
 async function initApp() {
-  await Promise.all([loadBundledTasksFromServer(), loadServerCatalog()]);
+  await Promise.all([loadBundledTasksFromServer(), loadServerCatalog(), loadAllCurricula()]);
   boot();
+  const route = parseRouteHash();
+  if (route?.subjectId && getSubject(route.subjectId)) {
+    openLesson(route.subjectId);
+  }
 }
+
+window.addEventListener("hashchange", () => {
+  const route = parseRouteHash();
+  if (!route?.subjectId || !getSubject(route.subjectId)) return;
+  if (activeSubjectId !== route.subjectId) {
+    openLesson(route.subjectId);
+    return;
+  }
+  if (route.lessonKey && normalizeLessonKey(activeLessonKey) !== route.lessonKey) {
+    selectLesson(route.subjectId, route.lessonKey);
+  }
+});
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initApp);

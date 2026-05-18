@@ -1,0 +1,10 @@
+{
+  "subjectId": "english",
+  "subjectName": "Английский язык",
+  "umk": "Spotlight 3",
+  "lessons": [
+    { "id": "m1", "slug": "lesson-m1", "title": "Module 1. Hello!" },
+    { "id": "m2", "slug": "lesson-m2", "title": "Module 2. My World" },
+    { "id": "sb", "slug": "lesson-sb", "title": "Storytime / Сборник" }
+  ]
+}

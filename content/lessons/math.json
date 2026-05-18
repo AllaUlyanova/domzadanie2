@@ -1,0 +1,30 @@
+{
+  "subjectId": "math",
+  "subjectName": "Математика",
+  "umk": "Моро 3 класс",
+  "generate": {
+    "from": 1,
+    "to": 110,
+    "titleTemplate": "Урок {n}"
+  },
+  "overrides": {
+    "5": { "title": "Урок 5. Сложение трёхзначных чисел" },
+    "12": { "title": "Урок 12. Умножение" },
+    "20": { "title": "Урок 20. Деление" },
+    "35": { "title": "Урок 35. Задачи на сложение и вычитание" }
+  },
+  "parts": [
+    {
+      "lessonFrom": 1,
+      "lessonTo": 60,
+      "bookId": "math-moro-ch1",
+      "label": "Учебник, часть 1"
+    },
+    {
+      "lessonFrom": 61,
+      "lessonTo": 110,
+      "bookId": "math-moro-ch2",
+      "label": "Учебник, часть 2"
+    }
+  ]
+}

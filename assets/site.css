@@ -786,6 +786,9 @@ textarea {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 14px;
+  max-height: min(58vh, 520px);
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .lesson-picker__card {
@@ -805,6 +808,15 @@ textarea {
   transform: translateY(-4px);
   border-color: var(--accent);
   box-shadow: var(--shadow-lg);
+}
+
+.lesson-picker__card--book {
+  border-style: dashed;
+  background: var(--accent-soft);
+}
+
+.lesson-picker__card--book:hover {
+  background: var(--surface-strong);
 }
 
 .lesson-picker__name {

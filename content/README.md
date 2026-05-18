@@ -38,6 +38,17 @@ content/
 
 `russian`, `reading`, `math`, `world`, `english`, `art`, `music`, `tech`, `pe`
 
+## Каталог уроков (все уроки на сайте)
+
+Файлы `content/lessons/{subjectId}.json` — **полный список уроков** (не только те, где есть задания).
+
+**Математика** (`math.json`): автогенерация уроков 1–110 (`generate.from` / `generate.to`).  
+Добавить задания — в `content/tasks/math-moro-3.json` с `lessonId: "u5"` или `lessonSlug: "lesson-5"`.
+
+**Английский** (`english.json`): список модулей Spotlight в `lessons[]`.
+
+Логика: `assets/lessons-engine.js` → `getLessonsData(subjectId, tasks)`.
+
 ## Новый учебник (другой предмет)
 
 1. PDF в `content/textbooks/{subjectId}/`.
