@@ -3,7 +3,11 @@
  * Все карточки кликабельны; задания подмешиваются по slug / lessonId.
  */
 
-const CURRICULA_URLS = ["./content/lessons/math.json", "./content/lessons/english.json"];
+const CURRICULA_URLS = [
+  "./content/lessons/math.json",
+  "./content/lessons/russian.json",
+  "./content/lessons/english.json",
+];
 
 /** @type {Record<string, object>} */
 let curriculaBySubject = {};
@@ -217,6 +221,41 @@ export function parseRouteHash() {
     return { subjectId: null, lessonKey: normalizeLessonKey(parts[0]) };
   }
   return null;
+}
+
+/**
+ * Маршрут страницы урока:
+ * lesson.html?subject=math&id=5
+ * lesson.html?subject=math  (список всех уроков)
+ * /lesson/5?subject=math    (GitHub Pages / статический хостинг с путём)
+ */
+export function parseLessonRoute(loc = window.location) {
+  const pathMatch = loc.pathname.match(/\/lesson\/([^/]+)\/?$/i);
+  const params = new URLSearchParams(loc.search);
+  const subjectId = params.get("subject") || params.get("s");
+  const idParam = params.get("id") || params.get("lesson") || (pathMatch ? pathMatch[1] : null);
+
+  if (!subjectId && !idParam) {
+    const hash = parseRouteHash();
+    if (hash?.subjectId) return hash;
+    return null;
+  }
+
+  return {
+    subjectId: subjectId || null,
+    lessonKey: idParam != null ? normalizeLessonKey(idParam) : null,
+  };
+}
+
+export function buildLessonListUrl(subjectId, base = "./lesson.html") {
+  return `${base}?subject=${encodeURIComponent(subjectId)}`;
+}
+
+export function buildLessonPageUrl(subjectId, lessonKey, base = "./lesson.html") {
+  const key = normalizeLessonKey(lessonKey);
+  const num = key.match(/^lesson-(\d+)$/);
+  const id = num ? num[1] : key.replace(/^lesson-/, "");
+  return `${base}?subject=${encodeURIComponent(subjectId)}&id=${encodeURIComponent(id)}`;
 }
 
 export function setLessonRoute(subjectId, lessonKey) {

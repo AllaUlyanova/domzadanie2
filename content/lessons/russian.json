@@ -1,0 +1,24 @@
+{
+  "subjectId": "russian",
+  "subjectName": "Русский язык",
+  "umk": "Канакина, Горецкий 3 класс",
+  "generate": {
+    "from": 1,
+    "to": 136,
+    "titleTemplate": "Урок {n}"
+  },
+  "parts": [
+    {
+      "lessonFrom": 1,
+      "lessonTo": 68,
+      "bookId": "russian-kanakina-ch1",
+      "label": "Учебник, часть 1"
+    },
+    {
+      "lessonFrom": 69,
+      "lessonTo": 136,
+      "bookId": "russian-kanakina-ch2",
+      "label": "Учебник, часть 2"
+    }
+  ]
+}

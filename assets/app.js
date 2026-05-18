@@ -25,9 +25,9 @@ import {
   filterTasksByLessonKey,
   findLesson,
   normalizeLessonKey,
+  buildLessonListUrl,
+  buildLessonPageUrl,
   parseRouteHash,
-  setLessonRoute,
-  clearLessonRoute,
 } from "./lessons-engine.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -338,14 +338,19 @@ function buildSubjectCard(subject, mode, dateKey, index = 0) {
     <span class="dz-subject-card__pill">${STATUS_LABEL[st]}</span>
   `;
 
-  card.addEventListener("click", () => openLesson(subject.id));
+  const listUrl = buildLessonListUrl(subject.id);
+  card.addEventListener("click", () => {
+    window.location.href = listUrl;
+  });
   card.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      openLesson(subject.id);
+      window.location.href = listUrl;
     }
   });
   card.tabIndex = 0;
+  card.setAttribute("role", "link");
+  card.setAttribute("aria-label", `Открыть уроки: ${subject.name}`);
 
   return card;
 }
@@ -791,49 +796,7 @@ function checkAllHomework(subject, tasks) {
 function openLesson(subjectId) {
   const subject = getSubject(subjectId);
   if (!subject) return;
-
-  activeSubjectId = subjectId;
-  activeLessonKey = null;
-  const section = $("#lesson");
-  section?.classList.remove("is-hidden");
-  section?.setAttribute("aria-hidden", "false");
-  openLessonMotion(section);
-  section?.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  $("#lessonTitle").textContent = subject.name;
-
-  const allTasks = tasksForSubject(subjectId);
-  const lessons = getLessonsData(subjectId, allTasks);
-
-  renderLessonMaterials(subjectId);
-
-  if (!lessons.length && !allTasks.length) {
-    $("#lessonPicker")?.classList.add("is-hidden");
-    $("#lessonToolbar")?.classList.add("is-hidden");
-    $("#lessonMeta").textContent = subject.workbookHint;
-    $("#lessonBookRef").textContent = `Учебник: ${subject.textbookHint}`;
-    renderTasks(subject, []);
-    updateNotebookButton(subject, []);
-    syncLessonSteps(subject, []);
-    syncLessonGuide("empty");
-    return;
-  }
-
-  const route = parseRouteHash();
-  const routeKey = route?.subjectId === subjectId ? route.lessonKey : null;
-  const saved = savedLessonKey(subjectId);
-  const savedNorm = saved ? normalizeLessonKey(saved) : null;
-  const targetKey = routeKey || savedNorm;
-  const targetLesson = targetKey ? findLesson(lessons, targetKey) : null;
-
-  if (targetLesson) {
-    selectLesson(subjectId, targetLesson.key);
-    return;
-  }
-
-  $("#lessonMeta").textContent = `${lessons.length} уроков · выберите нужный`;
-  $("#lessonBookRef").textContent = `Учебник: ${subject.textbookHint}`;
-  renderLessonPicker(subject, lessons, allTasks);
+  window.location.href = buildLessonListUrl(subject.id);
 }
 
 function closeLesson() {
@@ -1219,25 +1182,25 @@ function boot() {
   requestAnimationFrame(() => refreshScrollReveal());
 }
 
+function redirectFromHashRoute() {
+  const route = parseRouteHash();
+  if (!route?.subjectId || !getSubject(route.subjectId)) return false;
+  if (route.lessonKey) {
+    window.location.href = buildLessonPageUrl(route.subjectId, route.lessonKey);
+  } else {
+    window.location.href = buildLessonListUrl(route.subjectId);
+  }
+  return true;
+}
+
 async function initApp() {
   await Promise.all([loadBundledTasksFromServer(), loadServerCatalog(), loadAllCurricula()]);
+  if (redirectFromHashRoute()) return;
   boot();
-  const route = parseRouteHash();
-  if (route?.subjectId && getSubject(route.subjectId)) {
-    openLesson(route.subjectId);
-  }
 }
 
 window.addEventListener("hashchange", () => {
-  const route = parseRouteHash();
-  if (!route?.subjectId || !getSubject(route.subjectId)) return;
-  if (activeSubjectId !== route.subjectId) {
-    openLesson(route.subjectId);
-    return;
-  }
-  if (route.lessonKey && normalizeLessonKey(activeLessonKey) !== route.lessonKey) {
-    selectLesson(route.subjectId, route.lessonKey);
-  }
+  redirectFromHashRoute();
 });
 
 if (document.readyState === "loading") {

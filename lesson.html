@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Урок — Умный Дневник AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/site.css" />
+    <link rel="stylesheet" href="./assets/lesson-page.css" />
+  </head>
+  <body class="lesson-page-body">
+    <a class="skip-link" href="#lessonMain">К содержанию</a>
+    <div class="bg-mesh" aria-hidden="true"></div>
+
+    <header class="site-header is-scrolled" id="siteHeader">
+      <div class="site-header__inner">
+        <a href="./index.html" class="site-logo">
+          <span class="site-logo__mark" aria-hidden="true">📘</span>
+          <span>Умный Дневник <em>AI</em></span>
+        </a>
+        <nav class="site-nav" aria-label="Навигация">
+          <a href="./index.html">Главная</a>
+          <a href="./index.html#subjects">Предметы</a>
+        </nav>
+        <div class="site-header__actions">
+          <button id="themeBtn" class="dz-btn dz-btn--ghost dz-btn--icon" type="button" aria-label="Тема">🌙</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="lessonMain" class="lesson-page-main">
+      <section class="lesson-page-loading" id="lessonLoading" aria-live="polite">
+        <div class="lesson-loading-card glass">
+          <div class="lesson-loading-spinner" aria-hidden="true"></div>
+          <p>Загружаем уроки и задания…</p>
+        </div>
+      </section>
+
+      <section class="lesson-page-not-found is-hidden" id="lessonNotFound" aria-live="polite">
+        <div class="container">
+          <div class="glass lesson-not-found-card">
+            <h1>Урок не найден</h1>
+            <p class="muted" id="lessonNotFoundText">Проверьте ссылку или выберите урок из списка.</p>
+            <p>
+              <a href="./index.html#subjects" class="dz-btn dz-btn--primary">← К предметам</a>
+              <a href="#" id="lessonNotFoundBack" class="dz-btn dz-btn--ghost">К списку уроков</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-page-list is-hidden" id="lessonListView">
+        <div class="container">
+          <header class="lesson-page-head">
+            <a href="./index.html#subjects" class="dz-btn dz-btn--ghost">← К предметам</a>
+            <p class="eyebrow" id="lessonListSubjectLabel">Предмет</p>
+            <h1 id="lessonListTitle">Уроки</h1>
+            <p class="muted" id="lessonListMeta">—</p>
+          </header>
+          <div id="lessonListMaterials" class="glass lesson-materials lesson-page-materials"></div>
+          <div class="lesson-picker__grid lesson-page-grid" id="lessonListGrid" role="list"></div>
+        </div>
+      </section>
+
+      <section class="lesson-page-detail is-hidden" id="lessonDetailView">
+        <div class="container">
+          <header class="lesson-page-head">
+            <a href="#" id="backToListLink" class="dz-btn dz-btn--ghost">← Все уроки</a>
+            <p class="eyebrow" id="lessonDetailSubject">Предмет</p>
+            <p class="lesson-page-number" id="lessonDetailNumber">Урок №</p>
+            <h1 id="lessonDetailTitle">Урок</h1>
+            <p class="muted" id="lessonDetailMeta">—</p>
+          </header>
+
+          <div class="lesson-page-progress glass">
+            <div class="lesson-page-progress__head">
+              <strong>Прогресс урока</strong>
+              <span id="lessonProgressText" class="muted">0 / 0</span>
+            </div>
+            <div class="progress" aria-hidden="true">
+              <div class="progress__bar" id="lessonProgressBar" style="width: 0%"></div>
+            </div>
+            <ul class="lesson-page-stats">
+              <li>✓ Верно: <strong id="lessonStatCorrect">0</strong></li>
+              <li>✗ Ошибок: <strong id="lessonStatWrong">0</strong></li>
+              <li>○ Не проверено: <strong id="lessonStatPending">0</strong></li>
+            </ul>
+          </div>
+
+          <div class="lesson-layout lesson-page-layout">
+            <aside class="glass lesson-aside">
+              <h3 class="lesson-aside__title">Шаги</h3>
+              <ol class="steps" id="lessonSteps">
+                <li class="is-active">Решить на сайте</li>
+                <li>Проверить ответы</li>
+                <li>Перенести в тетрадь</li>
+              </ol>
+              <p class="muted lesson-aside__note" id="lessonBookRef">Учебник: —</p>
+              <button id="markNotebookBtn" class="dz-btn dz-btn--primary dz-btn--block" type="button">
+                Я переписал в тетрадь
+              </button>
+            </aside>
+            <div class="lesson-main">
+              <div id="lessonDetailMaterials" class="glass lesson-materials lesson-page-materials"></div>
+              <div id="lessonEmpty" class="glass muted lesson-empty is-hidden"></div>
+              <div id="taskList" class="task-list"></div>
+              <div id="homeworkResult" class="homework-result is-hidden" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__grid">
+        <a href="./index.html" class="site-logo site-logo--footer">
+          <span class="site-logo__mark">📘</span>
+          <span>Умный Дневник AI</span>
+        </a>
+        <p class="site-footer__copy muted">© 2026 · 3 класс</p>
+      </div>
+    </footer>
+
+    <script type="module" src="./js/lessons.js"></script>
+  </body>
+</html>
