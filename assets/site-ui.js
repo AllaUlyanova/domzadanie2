@@ -1,18 +1,10 @@
 /**
- * UI: header, homework AI demo, assistant, scroll helpers
+ * UI: header, homework AI demo, scroll helpers
  */
 (function () {
   "use strict";
 
   const $ = (sel, root) => (root || document).querySelector(sel);
-
-  const ASSISTANT_LINES = [
-    "Привет! Я помогу разобрать ошибки и не сдаваться 💜",
-    "Сначала выбери предмет — там все уроки по учебнику.",
-    "Не бойся ошибаться: каждая подсказка приближает к «Готово»!",
-    "Spotlight 3 уже на сайте — открой английский и выбери урок.",
-    "После проверки перепиши аккуратно в тетрадь ✏️",
-  ];
 
   const SUBJECT_NAMES = {
     math: "Математика",
@@ -186,21 +178,6 @@
     });
   }
 
-  function initAssistant() {
-    const textEl = $("#assistantText");
-    if (!textEl) return;
-    let idx = 0;
-    setInterval(() => {
-      idx = (idx + 1) % ASSISTANT_LINES.length;
-      textEl.style.opacity = "0";
-      setTimeout(() => {
-        textEl.textContent = ASSISTANT_LINES[idx];
-        textEl.style.opacity = "1";
-      }, 280);
-    }, 5000);
-    textEl.style.transition = "opacity 0.35s ease";
-  }
-
   function initSmoothAnchors() {
     document.querySelectorAll('a[href^="#"]').forEach((a) => {
       a.addEventListener("click", (e) => {
@@ -218,13 +195,11 @@
     document.addEventListener("DOMContentLoaded", () => {
       initHeader();
       initHomeworkForm();
-      initAssistant();
       initSmoothAnchors();
     });
   } else {
     initHeader();
     initHomeworkForm();
-    initAssistant();
     initSmoothAnchors();
   }
 })();
