@@ -446,9 +446,12 @@ textarea {
 
 .hero__mascot {
   width: min(360px, 90%);
+  max-height: 420px;
+  object-fit: contain;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   border: 3px solid rgba(255, 255, 255, 0.8);
+  background: #fff;
 }
 
 .hero__badge {
@@ -719,6 +722,120 @@ textarea {
 .lesson-materials__link {
   color: var(--accent);
   font-weight: 700;
+}
+
+.lesson-materials__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.lesson-materials__card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s;
+}
+
+.lesson-materials__card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.lesson-materials__card-icon {
+  font-size: 1.6rem;
+}
+
+.lesson-materials__card-title {
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.lesson-materials__card-type {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.lesson-materials__card-cta {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.lesson-picker__title {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.lesson-picker__lead {
+  margin: 0 0 18px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.lesson-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.lesson-picker__card {
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-strong);
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s;
+}
+
+.lesson-picker__card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-lg);
+}
+
+.lesson-picker__name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.lesson-picker__count {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.lesson-picker__prog {
+  font-size: 0.82rem;
+}
+
+.lesson-guide__steps {
+  margin: 12px 0 0;
+  padding-left: 1.2rem;
+}
+
+.lesson-guide__steps li {
+  margin-bottom: 8px;
+}
+
+.dz-btn--sm {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  margin-top: 12px;
 }
 
 .task-list {

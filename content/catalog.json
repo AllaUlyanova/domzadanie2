@@ -31,6 +31,22 @@
       "type": "flashcards",
       "umk": "Spotlight 3",
       "file": "content/textbooks/english/flashcards-spotlight-3.pdf"
+    },
+    {
+      "id": "math-moro-ch1",
+      "subjectId": "math",
+      "title": "Математика 3 класс — Учебник, часть 1",
+      "type": "учебник",
+      "umk": "Моро 3 класс",
+      "file": "content/textbooks/math/uchebnik-matematika-3-chast-1.pdf"
+    },
+    {
+      "id": "math-moro-ch2",
+      "subjectId": "math",
+      "title": "Математика 3 класс — Учебник, часть 2",
+      "type": "учебник",
+      "umk": "Моро 3 класс",
+      "file": "content/textbooks/math/uchebnik-matematika-3-chast-2.pdf"
     }
   ]
 }

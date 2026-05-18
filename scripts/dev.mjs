@@ -21,6 +21,7 @@ const mime = new Map([
   [".jpeg", "image/jpeg"],
   [".webp", "image/webp"],
   [".ico", "image/x-icon"],
+  [".pdf", "application/pdf"],
 ]);
 
 function safeResolve(urlPath) {

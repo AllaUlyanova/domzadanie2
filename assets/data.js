@@ -34,8 +34,9 @@ export const SUBJECTS = [
     icon: "🔢",
     accent: "#6ee7ff",
     written: true,
-    textbookHint: "Математика 3 кл. (Моро и др.)",
-    workbookHint: "Рабочая тетрадь 1–2",
+    textbookHint: "Математика 3 кл. — учебник (ч. 1 и ч. 2)",
+    workbookHint: "Учебник · см. ссылки PDF в уроке",
+    umk: "Моро 3 класс",
   },
   {
     id: "world",

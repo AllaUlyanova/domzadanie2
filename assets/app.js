@@ -31,7 +31,10 @@ const KEYS = {
   lesson: "school3_lesson_v1",
 };
 
-const BUNDLED_TASK_URLS = ["./content/tasks/english-spotlight-3.json"];
+const BUNDLED_TASK_URLS = [
+  "./content/tasks/english-spotlight-3.json",
+  "./content/tasks/math-moro-3.json",
+];
 const FEATURED_SUBJECT_IDS = ["math", "russian", "reading", "english", "world", "music", "tech"];
 let bundledTasks = [];
 let serverCatalog = null;
@@ -110,9 +113,11 @@ function getAllTasks() {
   const bundled = bundledTasks.filter((t) => !uploadedIds.has(t.id));
   const allIds = new Set([...uploaded, ...bundled].map((t) => t.id));
   const hasEnglishBundled = bundled.some((t) => t.subjectId === "english");
+  const hasMathBundled = bundled.some((t) => t.subjectId === "math");
   const demo = DEMO_TASKS.filter((t) => {
     if (allIds.has(t.id)) return false;
     if (hasEnglishBundled && t.subjectId === "english") return false;
+    if (hasMathBundled && t.subjectId === "math") return false;
     return true;
   });
   return [...uploaded, ...bundled, ...demo];
@@ -501,6 +506,57 @@ function syncLessonSteps(subject, tasks) {
   else updateLessonSteps(0);
 }
 
+function syncLessonGuide(phase, extra = {}) {
+  const guide = $("#lessonGuide");
+  if (!guide) return;
+  const books = extra.books ?? getCatalogBooks().filter((b) => b.subjectId === activeSubjectId);
+  const hasPdf = books.length > 0;
+
+  if (phase === "pick-lesson") {
+    guide.innerHTML = `
+      <p class="lesson-guide__title"><strong>Шаг 1 — выберите урок</strong></p>
+      <p class="muted lesson-guide__text">Нажмите на карточку урока ниже — откроются <strong>все задания</strong> этого урока.</p>
+      ${
+        hasPdf
+          ? `<p class="muted lesson-guide__text">📚 Учебники: <strong>${books.length}</strong> PDF — ссылки выше в блоке «Материалы».</p>`
+          : ""
+      }
+    `;
+    return;
+  }
+
+  if (phase === "tasks") {
+    guide.innerHTML = `
+      <p class="lesson-guide__title"><strong>Как сделать домашку</strong></p>
+      <ol class="lesson-guide__steps muted">
+        <li>${hasPdf ? "Откройте <strong>PDF</strong> в блоке «Материалы» и найдите страницу из задания." : "Откройте учебник на нужной странице."}</li>
+        <li>Решите в тетради, введите <strong>ответ</strong> в поле под заданием.</li>
+        <li>Нажмите <strong>«Проверить»</strong> — внизу появится результат по уроку.</li>
+      </ol>
+      ${
+        extra.lessonsCount > 1
+          ? `<button type="button" class="dz-btn dz-btn--ghost dz-btn--sm" id="guideChangeLessonBtn">← Выбрать другой урок</button>`
+          : ""
+      }
+    `;
+    $("#guideChangeLessonBtn")?.addEventListener("click", showLessonPickerAgain);
+    return;
+  }
+
+  if (phase === "empty") {
+    guide.innerHTML = `
+      <p class="lesson-guide__title"><strong>Задания скоро появятся</strong></p>
+      <p class="muted">Учебники уже на сайте — откройте PDF выше. Задания для проверки добавляются в файл <code>content/tasks/</code>.</p>
+    `;
+    return;
+  }
+
+  guide.innerHTML = `
+    <p class="lesson-guide__title"><strong>Домашнее задание</strong></p>
+    <p class="muted">Выберите урок ниже.</p>
+  `;
+}
+
 // ---------- Lesson ----------
 let activeSubjectId = null;
 
@@ -539,6 +595,7 @@ function renderLessonPicker(subject, lessons, allTasks) {
   picker.querySelectorAll("[data-lesson-key]").forEach((btn) => {
     btn.addEventListener("click", () => selectLesson(subject.id, btn.dataset.lessonKey));
   });
+  syncLessonGuide("pick-lesson", { books: getCatalogBooks().filter((b) => b.subjectId === subject.id) });
 }
 
 function populateLessonSelect(subjectId, lessons, currentKey) {
@@ -586,6 +643,7 @@ function selectLesson(subjectId, lessonKey) {
   renderTasks(subject, tasks, { inLesson: true });
   updateNotebookButton(subject, tasks);
   syncLessonSteps(subject, tasks);
+  syncLessonGuide("tasks", { lessonsCount: lessons.length });
 }
 
 function showLessonPickerAgain() {
@@ -611,20 +669,20 @@ function renderLessonMaterials(subjectId) {
   const subject = getSubject(subjectId);
   box.innerHTML = `
     <h3 class="lesson-materials__title">📚 Материалы${subject?.umk ? ` · ${escapeHtml(subject.umk)}` : ""}</h3>
-    <p class="muted lesson-materials__lead">Откройте PDF, найдите страницу из задания, затем введите ответ ниже.</p>
-    <ul class="lesson-materials__list">
+    <p class="muted lesson-materials__lead">Нажмите на учебник — PDF откроется в новой вкладке. Найдите страницу из задания.</p>
+    <div class="lesson-materials__grid">
       ${books
         .map(
           (b) => `
-        <li>
-          <a class="lesson-materials__link" href="./${escapeHtml(b.file || "")}" target="_blank" rel="noopener">
-            ${escapeHtml(b.title || "PDF")}
-          </a>
-          <span class="muted lesson-materials__type">${escapeHtml(b.type || "")}</span>
-        </li>`,
+        <a class="lesson-materials__card" href="./${escapeHtml(b.file || "")}" target="_blank" rel="noopener">
+          <span class="lesson-materials__card-icon" aria-hidden="true">📖</span>
+          <span class="lesson-materials__card-title">${escapeHtml(b.title || "PDF")}</span>
+          <span class="lesson-materials__card-type">${escapeHtml(b.type || "учебник")}</span>
+          <span class="lesson-materials__card-cta">Открыть PDF →</span>
+        </a>`,
         )
         .join("")}
-    </ul>
+    </div>
   `;
 }
 
@@ -739,6 +797,7 @@ function openLesson(subjectId) {
     renderTasks(subject, []);
     updateNotebookButton(subject, []);
     syncLessonSteps(subject, []);
+    syncLessonGuide("empty");
     return;
   }
 
