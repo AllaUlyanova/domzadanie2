@@ -6,8 +6,6 @@ import {
   getSubject,
   checkAnswer,
 } from "./data.js";
-import { initHeroHeadline } from "./text-type.js";
-import { renderReviews, initReviewsScrollStack } from "./reviews.js";
 import {
   initScrollReveal,
   refreshScrollReveal,
@@ -34,6 +32,7 @@ const KEYS = {
 };
 
 const BUNDLED_TASK_URLS = ["./content/tasks/english-spotlight-3.json"];
+const FEATURED_SUBJECT_IDS = ["math", "russian", "reading", "english", "world", "music", "tech"];
 let bundledTasks = [];
 let serverCatalog = null;
 
@@ -78,7 +77,7 @@ if (themeBtn) {
 
   const syncThemeLabel = () => {
     const dark = document.documentElement.dataset.theme === "dark";
-    themeBtn.textContent = dark ? "День" : "Вечер";
+    themeBtn.textContent = dark ? "☀️" : "🌙";
     themeBtn.setAttribute("aria-label", dark ? "Светлая тема" : "Тёмная тема");
   };
   syncThemeLabel();
@@ -297,10 +296,10 @@ const STATUS_LABEL = {
 
 const STATUS_CLASS = {
   todo: "",
-  progress: "subject-card--progress",
-  done: "subject-card--done",
-  empty: "subject-card--empty",
-  optional: "subject-card--optional",
+  progress: "dz-subject-card--progress",
+  done: "dz-subject-card--done",
+  empty: "dz-subject-card--empty",
+  optional: "dz-subject-card--optional",
 };
 
 function formatDateFull(d = new Date()) {
@@ -332,31 +331,33 @@ function buildSubjectCard(subject, mode, dateKey, index = 0) {
   const tasks = tasksForSubject(subject.id, dateKey);
   const subState = getSubjectState(subject.id, dateKey);
   const doneCount = tasks.filter((t) => subState.tasks[t.id]?.correct).length;
+  const progressPct = tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0;
 
   const card = document.createElement("article");
-  card.className = `subject-card reveal-in ${STATUS_CLASS[st] || ""}`;
+  card.className = `dz-subject-card reveal-in ${STATUS_CLASS[st] || ""}`;
   card.style.animationDelay = `${index * 0.055}s`;
   card.setAttribute("role", "listitem");
   card.dataset.subjectId = subject.id;
   card.style.setProperty("--subject-accent", subject.accent);
 
+  const metaText = subject.written
+    ? (() => {
+        const les = lessonsFromTasks(tasks);
+        return les.length > 1
+          ? `${les.length} уроков · ${doneCount}/${tasks.length || 0} заданий`
+          : `${doneCount}/${tasks.length || 0} заданий`;
+      })()
+    : subject.textbookHint;
+
   card.innerHTML = `
-    ${st === "done" ? '<span class="subject-card__stamp" aria-hidden="true">Готово</span>' : ""}
-    <div class="subject-card__icon" aria-hidden="true">${subject.icon}</div>
-    <h3 class="subject-card__title">${subject.name}</h3>
-    <p class="subject-card__meta muted">
-      ${
-        subject.written
-          ? (() => {
-              const les = lessonsFromTasks(tasks);
-              return les.length > 1
-                ? `${les.length} уроков · ${doneCount}/${tasks.length || 0} зад.`
-                : `${doneCount}/${tasks.length || 0} заданий`;
-            })()
-          : "Без письменных заданий"
-      }
-    </p>
-    <span class="subject-card__badge">${STATUS_LABEL[st]}</span>
+    ${st === "done" ? '<span class="dz-subject-card__stamp" aria-hidden="true">Готово</span>' : ""}
+    <div class="dz-subject-card__icon" aria-hidden="true">${subject.icon}</div>
+    <h3 class="dz-subject-card__title">${subject.name}</h3>
+    <p class="dz-subject-card__meta">${metaText}</p>
+    <div class="dz-subject-card__progress" aria-hidden="true">
+      <div class="dz-subject-card__progress-bar" style="width:${progressPct}%"></div>
+    </div>
+    <span class="dz-subject-card__pill">${STATUS_LABEL[st]}</span>
   `;
 
   card.addEventListener("click", () => openLesson(subject.id));
@@ -371,28 +372,22 @@ function buildSubjectCard(subject, mode, dateKey, index = 0) {
   return card;
 }
 
-function renderTodayGrid() {
-  const grid = $("#todayGrid");
+function renderSubjectsGrid() {
+  const grid = $("#subjectsGrid");
   if (!grid) return;
   grid.innerHTML = "";
   const dk = todayKey();
-  SUBJECTS.forEach((s, i) => grid.appendChild(buildSubjectCard(s, "today", dk, i)));
+  const list = SUBJECTS.filter((s) => FEATURED_SUBJECT_IDS.includes(s.id));
+  list.forEach((s, i) => grid.appendChild(buildSubjectCard(s, "grid", dk, i)));
   refreshScrollReveal();
 }
 
+function renderTodayGrid() {
+  renderSubjectsGrid();
+}
+
 function renderCatalogGrid() {
-  const grid = $("#catalogGrid");
-  if (!grid) return;
-  grid.innerHTML = "";
-  SUBJECTS.forEach((s, i) => {
-    const card = buildSubjectCard(s, "catalog", todayKey(), i);
-    const meta = card.querySelector(".subject-card__meta");
-    if (meta) {
-      meta.textContent = s.textbookHint;
-    }
-    grid.appendChild(card);
-  });
-  refreshScrollReveal();
+  renderSubjectsGrid();
 }
 
 function updateDashboard() {
@@ -768,10 +763,9 @@ function closeLesson() {
   const section = $("#lesson");
   section?.classList.add("is-hidden");
   section?.setAttribute("aria-hidden", "true");
-  $("#today")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  renderTodayGrid();
+  $("#subjects")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  renderSubjectsGrid();
   updateDashboard();
-  renderJournal();
 }
 
 function updateNotebookButton(subject, tasks) {
@@ -806,7 +800,7 @@ function renderTasks(subject, tasks, opts = {}) {
   if (!tasks.length) {
     empty.classList.remove("is-hidden");
     empty.textContent = subject.written
-      ? "Заданий пока нет. Родитель может загрузить файл с заданиями в разделе «Учебники»."
+      ? "Заданий пока нет для этого предмета. Для английского убедитесь, что сайт открыт через локальный сервер."
       : "Письменных заданий на сайте нет. Выполните задание учителя и нажмите «Отметить выполнение».";
     $("#homeworkResult")?.classList.add("is-hidden");
     $("#lessonMaterials")?.classList.add("is-hidden");
@@ -936,7 +930,7 @@ $("#markNotebookBtn")?.addEventListener("click", () => {
   syncLessonSteps(subject, tasks);
   renderTodayGrid();
   if (!wasDone) {
-    const card = document.querySelector(`.subject-card[data-subject-id="${activeSubjectId}"]`);
+    const card = document.querySelector(`.dz-subject-card[data-subject-id="${activeSubjectId}"]`);
     popSubjectStamp(card);
   }
   updateDashboard();
@@ -959,7 +953,7 @@ $("#resetDayBtn")?.addEventListener("click", () => {
 $("#continueDayBtn")?.addEventListener("click", () => {
   const next = SUBJECTS.find((s) => subjectStatus(s) !== "done");
   if (next) openLesson(next.id);
-  else $("#today")?.scrollIntoView({ behavior: "smooth" });
+  else $("#subjects")?.scrollIntoView({ behavior: "smooth" });
 });
 
 // ---------- Upload ----------
@@ -1137,15 +1131,9 @@ $("#saveStudentDialogBtn")?.addEventListener("click", (e) => {
 // ---------- Init ----------
 function boot() {
   renderStudentName();
-  renderTodayGrid();
-  renderCatalogGrid();
+  renderSubjectsGrid();
   updateDashboard();
-  renderJournal();
-  renderCatalog();
-  renderReviews();
-  initHeroHeadline();
   initScrollReveal();
-  initReviewsScrollStack();
   requestAnimationFrame(() => refreshScrollReveal());
 }
 

@@ -95,9 +95,9 @@ export function playNotebookStamp(btn) {
 
 export function popSubjectStamp(card) {
   if (!card || !motionAllowed()) return;
-  const stamp = card.querySelector(".subject-card__stamp");
+  const stamp = card.querySelector(".dz-subject-card__stamp, .subject-card__stamp");
   if (!stamp) return;
-  stamp.classList.add("subject-card__stamp--pop");
+  stamp.classList.add("dz-subject-card__stamp--pop", "subject-card__stamp--pop");
 }
 
 export function openLessonMotion(section) {
